@@ -1,0 +1,26 @@
+<idea-plugin>
+    <id>ru.ztrap.plugin.idea.compose-color-preview</id>
+    <name>Compose colors preview</name>
+    <category>Editor</category>
+    <vendor url="https://github.com/zTrap">Peter Gulko (zTrap)</vendor>
+
+    <description><![CDATA[
+        <h1>Compose colors preview.</h1>
+        <p>This plugin draws colors on editor's gutter. You can modify colors by clicking on icons!</p>
+
+        <p>It works with <code>androidx.compose.ui.graphics.Color</code> from
+        <a href="https://developer.android.com/jetpack/compose">Jetpack Compose</a> or
+        <a href="https://www.jetbrains.com/ru-ru/lp/compose-mpp/">Compose Multiplatform</a></p>
+
+        <br><br>
+        <a href="https://github.com/zTrap/compose-color-preview-plugin">GitHub</a> | <a href="https://github.com/zTrap/compose-color-preview-plugin/issues">Issues</a>
+    ]]></description>
+
+    <depends>com.intellij.modules.platform</depends>
+    <depends>com.intellij.modules.java</depends>
+    <depends>org.jetbrains.kotlin</depends>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <colorProvider implementation="ru.ztrap.plugin.idea.compose.color.preview.ComposeColorProvider"/>
+    </extensions>
+</idea-plugin>
