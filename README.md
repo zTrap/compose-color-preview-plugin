@@ -4,24 +4,24 @@
 
 This plugin draws colors on editor's gutter. You can modify colors by clicking on icons
 
-It works with `androidx.compose.ui.graphics.Color` from 
-[Jetpack Compose](https://developer.android.com/jetpack/compose) or 
+It works with `androidx.compose.ui.graphics.Color` from
+[Jetpack Compose](https://developer.android.com/jetpack/compose) or
 [Compose Multiplatform](https://www.jetbrains.com/ru-ru/lp/compose-mpp)
 
 ## Features
 
-   * Show preview in `Color` creation places ✔️
-     * ULong constructor ✔️
-     * Long function "constructor" ✔️
-     * Int function "constructor" ✔️
-     * Int x3 function "constructor" ✔️
-     * Float x3 function "constructor" ✔️
-     * Float x3 with color scheme function "constructor" ✔️
-     * Float x4 function "constructor" ✔️
-     * Float x4 with color scheme function "constructor" ✔️
-   * Show palette by clicking on preview to change color ✔️
-      * Change color with saving original numeral system  ✔️
-   * Show preview in places fields with type `Color` usage ❌
+- [x] Show preview in `Color` creation places
+    - [x] ULong constructor
+    - [x] Long function "constructor"
+    - [x] Int function "constructor"
+    - [x] Int x3 function "constructor"
+    - [x] Float x3 function "constructor"
+    - [x] Float x3 with color scheme function "constructor"
+    - [x] Float x4 function "constructor"
+    - [x] Float x4 with color scheme function "constructor"
+- [x] Show palette by clicking on preview to change color
+    - [x] Change color with saving original numeral system
+- [ ] Show preview in places fields usage with type `Color`
 
 ![Preview](./.github/preview.png)
 
@@ -29,18 +29,23 @@ It works with `androidx.compose.ui.graphics.Color` from
 
 Install it from the Jetbrains plugin repository within your IDE (**recommended**):
 
-- <kbd>File</kbd> > <kbd>Settings</kbd> > <kbd>Plugins</kbd> > <kbd>Browse repositories...</kbd> > <kbd>Search 'Color preview'</kbd> > <kbd>Category 'Editor'</kbd>
+- <kbd>File</kbd> > <kbd>Settings</kbd> > <kbd>Plugins</kbd> > <kbd>Browse repositories...</kbd> > <kbd>Search 'Color
+  preview'</kbd> > <kbd>Category 'Editor'</kbd>
 
-You can also download the JAR package from the [Jetbrains plugin repository](https://plugins.jetbrains.com/plugin/21298-compose-colors-preview) or 
-from [GitHub Releases](https://github.com/zTrap/compose-color-preview-plugin/releases) and add it manually to your plugins:
+You can also download the JAR package from
+the [Jetbrains plugin repository](https://plugins.jetbrains.com/plugin/21298-compose-colors-preview) or
+from [GitHub Releases](https://github.com/zTrap/compose-color-preview-plugin/releases) and add it manually to your
+plugins:
 
-- <kbd>File</kbd> > <kbd>Settings</kbd> > <kbd>Preferences</kbd> > <kbd>Plugins</kbd> > <kbd>⚙️</kbd> > <kbd>Install plugin from disk...</kbd>
+- <kbd>File</kbd> > <kbd>Settings</kbd> > <kbd>Preferences</kbd> > <kbd>Plugins</kbd> > <kbd>⚙️</kbd> > <kbd>Install
+  plugin from disk...</kbd>
 
 ## Contribution
 
 Contributions are welcome. Please check [CONTRIBUTING.md](./CONTRIBUTING.md) for more information.
 
-Besides source code contributions, feel free to open bug reports or just suggest new features [here](https://github.com/zTrap/compose-color-preview-plugin/issues).
+Besides source code contributions, feel free to open bug reports or just suggest new
+features [here](https://github.com/zTrap/compose-color-preview-plugin/issues).
 
 ## License
 
