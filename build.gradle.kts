@@ -2,28 +2,32 @@ fun prop(key: String) = project.findProperty(key).toString()
 
 plugins {
     id("java")
-    id("org.jetbrains.kotlin.jvm") version "1.8.10"
-    id("org.jetbrains.intellij") version "1.13.2"
+    id("org.jetbrains.intellij") version "1.17.3"
+    // https://plugins.jetbrains.com/docs/intellij/using-kotlin.html#kotlin-standard-library
+    id("org.jetbrains.kotlin.jvm") version "1.7.0"
 }
 
 group = "ru.ztrap.plugin.idea"
-version = "0.0.1"
+version = "0.0.2-223"
 
 repositories {
     mavenCentral()
 }
 
+// See https://plugins.jetbrains.com/docs/intellij/tools-gradle-intellij-plugin.html
 intellij {
-    version.set("2022.3.3")
+    version.set("2022.3")
     type.set("IC")
 
     plugins.set(
         listOf(
+            "com.intellij.java",
             "org.jetbrains.kotlin",
-            "com.intellij.java"
         ),
     )
 }
+
+val jvmVersion = JavaVersion.VERSION_17.toString()
 
 tasks {
     buildSearchableOptions {
@@ -31,19 +35,19 @@ tasks {
     }
 
     // Set the JVM compatibility versions
-    withType<JavaCompile> {
-        sourceCompatibility = JavaVersion.VERSION_17.toString()
-        targetCompatibility = JavaVersion.VERSION_17.toString()
+    compileJava {
+        sourceCompatibility = jvmVersion
+        targetCompatibility = jvmVersion
     }
 
-    withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-        kotlinOptions.jvmTarget = JavaVersion.VERSION_17.toString()
+    compileKotlin {
+        kotlinOptions.jvmTarget = jvmVersion
     }
 
     patchPluginXml {
         version.set(project.version.toString())
-        sinceBuild.set("221")
-        untilBuild.set("233.*")
+        sinceBuild.set("223")
+        untilBuild.set("231.*")
     }
 
     signPlugin {

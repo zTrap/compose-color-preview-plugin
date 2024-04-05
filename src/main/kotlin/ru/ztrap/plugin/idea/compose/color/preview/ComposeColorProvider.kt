@@ -9,10 +9,10 @@ import com.intellij.openapi.editor.ElementColorProvider
 import com.intellij.psi.PsiElement
 import com.intellij.psi.impl.source.tree.LeafPsiElement
 import com.intellij.psi.tree.IElementType
-import com.intellij.util.asSafely
 import org.jetbrains.kotlin.KtNodeTypes
 import org.jetbrains.kotlin.idea.KotlinLanguage
 import org.jetbrains.kotlin.idea.caches.resolve.analyze
+import org.jetbrains.kotlin.idea.references.mainReference
 import org.jetbrains.kotlin.lexer.KtTokens
 import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtConstantExpression
@@ -155,8 +155,8 @@ class ComposeColorProvider : ElementColorProvider {
 
     private fun KtCallExpression.isComposeColorFun(): Boolean {
         return children.firstOrNull()
-            ?.asSafely<KtNameReferenceExpression>()
-            ?.reference
+            ?.safeCast<KtNameReferenceExpression>()
+            ?.mainReference
             ?.resolve()
             ?.kotlinFqOrConstructorName
             ?.asString() == COMPOSE_COLOR_FQ_NAME
@@ -297,30 +297,40 @@ class ComposeColorProvider : ElementColorProvider {
 
     private fun List<KtValueArgument>.getConstructorType(): ColorConstructors? {
         val firstArgument = first()
-        val firstArgumentText = firstArgument.lastChild.text
-        val isULong = firstArgument.isTyped(KtNodeTypes.INTEGER_CONSTANT) && firstArgumentText.contains("u", true)
-        val isInt = firstArgument.isTyped(KtNodeTypes.INTEGER_CONSTANT) && firstArgumentText.toIntOrNull() != null
-        val isFloat = firstArgument.isTyped(KtNodeTypes.FLOAT_CONSTANT)
-        val haveSpace = findColorSpace().let {
-            it?.lastChild is KtReferenceExpression || it?.lastChild is KtDotQualifiedExpression
-        }
+        if (size == 1) {
+            val firstArgumentText = firstArgument.lastChild.text
+            val isULong = firstArgument.isTyped(KtNodeTypes.INTEGER_CONSTANT) && firstArgumentText.contains("u", true)
+            val isInt = firstArgument.isTyped(KtNodeTypes.INTEGER_CONSTANT) && firstArgumentText.toIntOrNull() != null
 
-        return when (size) {
-            1 -> when {
+            return when {
                 isULong -> ColorConstructors.ULONG
                 isInt -> ColorConstructors.INT
                 else -> ColorConstructors.LONG
             }
-            3 -> if (isFloat) ColorConstructors.FLOAT_x3 else ColorConstructors.INT_x3
-            4 -> when {
+        }
+
+        val isFloat = firstArgument.isTyped(KtNodeTypes.FLOAT_CONSTANT)
+        if (size == 3) {
+            return if (isFloat) ColorConstructors.FLOAT_x3 else ColorConstructors.INT_x3
+        }
+
+        if (size == 4) {
+            val haveSpace = findColorSpace().let {
+                it?.lastChild is KtReferenceExpression || it?.lastChild is KtDotQualifiedExpression
+            }
+
+            return when {
                 isFloat && haveSpace -> ColorConstructors.FLOAT_x3_SPACE
                 isFloat -> ColorConstructors.FLOAT_x4
                 else -> ColorConstructors.INT_x4
             }
-
-            5 -> ColorConstructors.FLOAT_x4_SPACE
-            else -> null
         }
+
+        if (size == 5) {
+            return ColorConstructors.FLOAT_x4_SPACE
+        }
+
+        return null
     }
 
     private fun KtValueArgument?.getSpace(): ComposeColorSpace? {

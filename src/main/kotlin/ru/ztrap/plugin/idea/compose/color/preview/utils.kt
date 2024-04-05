@@ -76,3 +76,6 @@ internal fun ColorsValueArgumentsPack.replace(pack: ColorsExpressionsPack) {
 private fun <T : Any> T?.requireNotNull(): T {
     return requireNotNull(this)
 }
+
+@Suppress("UNCHECKED_CAST")
+internal fun <T : Any> Any.safeCast(): T? = this as? T
