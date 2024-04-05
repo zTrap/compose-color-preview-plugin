@@ -4,11 +4,11 @@ plugins {
     id("java")
     id("org.jetbrains.intellij") version "1.17.3"
     // https://plugins.jetbrains.com/docs/intellij/using-kotlin.html#kotlin-standard-library
-    id("org.jetbrains.kotlin.jvm") version "1.8.0"
+    id("org.jetbrains.kotlin.jvm") version "1.9.22"
 }
 
 group = "ru.ztrap.plugin.idea"
-version = "0.0.2-231"
+version = "0.0.2-241"
 
 repositories {
     mavenCentral()
@@ -16,7 +16,7 @@ repositories {
 
 // See https://plugins.jetbrains.com/docs/intellij/tools-gradle-intellij-plugin.html
 intellij {
-    version.set("2023.1")
+    version.set("2024.1")
     type.set("IC")
 
     plugins.set(
@@ -46,8 +46,8 @@ tasks {
 
     patchPluginXml {
         version.set(project.version.toString())
-        sinceBuild.set("231")
-        untilBuild.set("241.*")
+        sinceBuild.set("241")
+        untilBuild.set("251.*")
     }
 
     signPlugin {
