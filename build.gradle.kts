@@ -7,8 +7,11 @@ plugins {
     id("org.jetbrains.kotlin.jvm") version "1.7.0"
 }
 
+val ideMinVersion = "223"
+val pluginMajorVersion = "0.0.3"
+
 group = "ru.ztrap.plugin.idea"
-version = "0.0.2-223"
+version = "$pluginMajorVersion-$ideMinVersion"
 
 repositories {
     mavenCentral()
@@ -16,8 +19,8 @@ repositories {
 
 // See https://plugins.jetbrains.com/docs/intellij/tools-gradle-intellij-plugin.html
 intellij {
-    version.set("2022.3")
-    type.set("IC")
+    version = "2022.3"
+    type = "IC"
 
     plugins.set(
         listOf(
@@ -45,18 +48,18 @@ tasks {
     }
 
     patchPluginXml {
-        version.set(project.version.toString())
-        sinceBuild.set("223")
-        untilBuild.set("231.*")
+        version = project.version.toString()
+        sinceBuild = ideMinVersion
+        untilBuild = "231.*"
     }
 
     signPlugin {
-        certificateChainFile.set(file(prop("publishing.plugin.key.chain")))
-        privateKeyFile.set(file(prop("publishing.plugin.key")))
-        password.set(prop("publishing.plugin.password"))
+        certificateChainFile = file(prop("publishing.plugin.key.chain"))
+        privateKeyFile = file(prop("publishing.plugin.key"))
+        password = prop("publishing.plugin.password")
     }
 
     publishPlugin {
-        token.set(prop("publishing.plugin.token"))
+        token = prop("publishing.plugin.token")
     }
 }
