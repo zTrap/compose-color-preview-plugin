@@ -21,7 +21,7 @@ It works with `androidx.compose.ui.graphics.Color` from
     - [x] Float x4 with color scheme function "constructor"
 - [x] Show palette by clicking on preview to change color
     - [x] Change color with saving original numeral system
-- [ ] Show preview in places fields usage with type `Color`
+- [x] Show preview in places fields usage with type `Color`
 
 ![Preview](./.github/preview.png)
 
