@@ -1,7 +1,7 @@
 package ru.ztrap.plugin.idea.compose.color.preview
 
 @Suppress("EnumEntryName")
-internal enum class ColorConstructors {
+internal enum class ColorConstructorType {
     ULONG,
     LONG,
     INT,

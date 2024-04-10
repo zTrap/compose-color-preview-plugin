@@ -4,6 +4,17 @@
     <category>Editor</category>
     <vendor url="https://github.com/zTrap">Peter Gulko (zTrap)</vendor>
 
+    <change-notes><![CDATA[
+        <h2>New Features</h2>
+        <ul>
+          <li>Added display of colored icon for using fields (chaining proxy fields is also supported)</li>
+        </ul>
+        <h2>Bug Fixes</h2>
+        <ul>
+          <li>The property list now displays correctly when two or more colors are displayed on the same line</li>
+        </ul>
+    ]]></change-notes>
+
     <description><![CDATA[
         <h1>Compose colors preview.</h1>
         <p>This plugin draws colors on editor's gutter. You can modify colors by clicking on icons!</p>
@@ -21,6 +32,10 @@
     <depends>org.jetbrains.kotlin</depends>
 
     <extensions defaultExtensionNs="com.intellij">
+        <codeInsight.lineMarkerProvider
+            order="last"
+            language="kotlin"
+            implementationClass="ru.ztrap.plugin.idea.compose.color.preview.ComposeColorLineMarkerProvider"/>
         <colorProvider implementation="ru.ztrap.plugin.idea.compose.color.preview.ComposeColorProvider"/>
     </extensions>
 </idea-plugin>
