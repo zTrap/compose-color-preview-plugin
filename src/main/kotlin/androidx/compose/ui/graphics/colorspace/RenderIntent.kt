@@ -24,7 +24,8 @@ package androidx.compose.ui.graphics.colorspace
  *
  * @see ColorSpace.connect
  */
-@JvmInline
+/*@Immutable*/
+@kotlin.jvm.JvmInline
 value class RenderIntent internal constructor(@Suppress("unused") private val value: Int) {
     companion object {
         /**

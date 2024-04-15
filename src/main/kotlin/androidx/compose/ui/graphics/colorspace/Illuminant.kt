@@ -27,6 +27,12 @@ object Illuminant {
     val A = WhitePoint(0.44757f, 0.40745f)
 
     /**
+     * Standard CIE 1931 2° illuminant B, encoded in xyY.
+     * This illuminant has a color temperature of 4874K.
+     */
+    val B = WhitePoint(0.34842f, 0.35161f)
+
+    /**
      * Standard CIE 1931 2° illuminant C, encoded in xyY.
      * This illuminant has a color temperature of 6774K.
      */
@@ -40,6 +46,12 @@ object Illuminant {
     val D50 = WhitePoint(0.34567f, 0.35850f)
 
     /**
+     * Standard CIE 1931 2° illuminant D55, encoded in xyY.
+     * This illuminant has a color temperature of 5503K.
+     */
+    val D55 = WhitePoint(0.33242f, 0.34743f)
+
+    /**
      * Standard CIE 1931 2° illuminant D60, encoded in xyY.
      * This illuminant has a color temperature of 6004K.
      */
@@ -51,6 +63,18 @@ object Illuminant {
      * is commonly used in RGB color spaces such as sRGB, BT.209, etc.
      */
     val D65 = WhitePoint(0.31271f, 0.32902f)
+
+    /**
+     * Standard CIE 1931 2° illuminant D75, encoded in xyY.
+     * This illuminant has a color temperature of 7504K.
+     */
+    val D75 = WhitePoint(0.29902f, 0.31485f)
+
+    /**
+     * Standard CIE 1931 2° illuminant E, encoded in xyY.
+     * This illuminant has a color temperature of 5454K.
+     */
+    val E = WhitePoint(0.33333f, 0.33333f)
 
     internal val D50Xyz = floatArrayOf(0.964212f, 1.0f, 0.825188f)
 }

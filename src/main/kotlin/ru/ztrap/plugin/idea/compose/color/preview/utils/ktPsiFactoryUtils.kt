@@ -1,51 +1,52 @@
-package ru.ztrap.plugin.idea.compose.color.preview
+package ru.ztrap.plugin.idea.compose.color.preview.utils
 
-import androidx.compose.ui.graphics.Color as ComposeColor
-import java.awt.Color as AwtColor
 import org.jetbrains.kotlin.psi.KtExpression
 import org.jetbrains.kotlin.psi.KtPsiFactory
 import org.jetbrains.kotlin.psi.KtValueArgument
+import ru.ztrap.plugin.idea.compose.color.preview.ColorsExpressionsPack
+import ru.ztrap.plugin.idea.compose.color.preview.ColorsValueArgumentsPack
+
+private const val HEX_FORMAT_PREFIX = "0x"
+private const val HEX_FORMAT_RADIX = 16
 
 internal fun KtPsiFactory.createNewIntExpressionsPack(
     pack: ColorsValueArgumentsPack,
-    color: AwtColor,
+    colorComponents: FloatArray,
 ): ColorsExpressionsPack {
+    val (red, green, blue, alpha) = colorComponents
     return when (pack) {
         is ColorsValueArgumentsPack.ARGB -> ColorsExpressionsPack.ARGB(
-            red = createNewIntExpression(argument = pack.red, value = color.red),
-            green = createNewIntExpression(argument = pack.green, value = color.green),
-            blue = createNewIntExpression(argument = pack.blue, value = color.blue),
-            alpha = createNewIntExpression(argument = pack.alpha, value = color.alpha),
+            red = createNewIntExpression(argument = pack.red, value = red),
+            green = createNewIntExpression(argument = pack.green, value = green),
+            blue = createNewIntExpression(argument = pack.blue, value = blue),
+            alpha = createNewIntExpression(argument = pack.alpha, value = alpha),
         )
 
         is ColorsValueArgumentsPack.RGB -> ColorsExpressionsPack.RGB(
-            red = createNewIntExpression(argument = pack.red, value = color.red),
-            green = createNewIntExpression(argument = pack.green, value = color.green),
-            blue = createNewIntExpression(argument = pack.blue, value = color.blue),
+            red = createNewIntExpression(argument = pack.red, value = red),
+            green = createNewIntExpression(argument = pack.green, value = green),
+            blue = createNewIntExpression(argument = pack.blue, value = blue),
         )
     }
 }
 
 internal fun KtPsiFactory.createNewFloatExpressionsPack(
     pack: ColorsValueArgumentsPack,
-    color: ComposeColor,
+    colorComponents: FloatArray,
 ): ColorsExpressionsPack {
+    val (red, green, blue, alpha) = colorComponents
     return when (pack) {
         is ColorsValueArgumentsPack.ARGB -> ColorsExpressionsPack.ARGB(
-            red = createNewFloatExpression(value = color.red),
-            green = createNewFloatExpression(value = color.green),
-            blue = createNewFloatExpression(value = color.blue),
-            alpha = if (pack.alpha.isNamed()) {
-                createNewFloatExpression(name = COMPOSE_ALPHA_ARG_NAME, value = color.alpha)
-            } else {
-                createNewFloatExpression(value = color.alpha)
-            }
+            red = createNewFloatExpression(value = red),
+            green = createNewFloatExpression(value = green),
+            blue = createNewFloatExpression(value = blue),
+            alpha = createNewFloatExpression(value = alpha),
         )
 
         is ColorsValueArgumentsPack.RGB -> ColorsExpressionsPack.RGB(
-            red = createNewFloatExpression(value = color.red),
-            green = createNewFloatExpression(value = color.green),
-            blue = createNewFloatExpression(value = color.blue),
+            red = createNewFloatExpression(value = red),
+            green = createNewFloatExpression(value = green),
+            blue = createNewFloatExpression(value = blue),
         )
     }
 }
@@ -89,6 +90,10 @@ internal fun KtPsiFactory.createNewLongExpression(argument: KtValueArgument, val
     }
 }
 
+internal fun KtPsiFactory.createNewIntExpression(argument: KtValueArgument, value: Float): KtExpression {
+    return createNewIntExpression(argument, fractionToHex(value))
+}
+
 internal fun KtPsiFactory.createNewIntExpression(argument: KtValueArgument, value: Int): KtExpression {
     val argumentText = argument.lastChild.text
 
@@ -104,7 +109,7 @@ internal fun KtPsiFactory.createNewIntExpression(argument: KtValueArgument, valu
     return createExpression(text)
 }
 
-internal fun KtPsiFactory.createAlphaIntArgument(name: String? = null, value: Int): KtValueArgument {
+internal fun KtPsiFactory.createAlphaIntArgument(name: String? = null, value: Float): KtValueArgument {
     val newValue = buildString {
         name?.let {
             append(it)
@@ -112,7 +117,7 @@ internal fun KtPsiFactory.createAlphaIntArgument(name: String? = null, value: In
         }
 
         append(HEX_FORMAT_PREFIX)
-        append(value.toUInt().toString(HEX_FORMAT_RADIX))
+        append(fractionToHex(value).toUInt().toString(HEX_FORMAT_RADIX))
     }
     return createArgument(newValue)
 }

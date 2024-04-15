@@ -49,26 +49,38 @@ data class TransferParameters(
     val f: Double = 0.0
 ) {
     init {
-        if (a.isNaN() || b.isNaN() || c.isNaN() || d.isNaN() || e.isNaN() || f.isNaN() || gamma.isNaN()) {
+        if (a.isNaN() || b.isNaN() || c.isNaN() || d.isNaN() || e.isNaN() || f.isNaN() ||
+            gamma.isNaN()
+        ) {
             throw IllegalArgumentException("Parameters cannot be NaN")
         }
 
         // Next representable float after 1.0
         // We use doubles here but the representation inside our native code is often floats
-        if (d !in 0.0..1.0) {
-            throw IllegalArgumentException("Parameter d must be in the range [0..1], was $d")
+        if (!(d >= 0.0 && d <= 1.0)) {
+            throw IllegalArgumentException(
+                "Parameter d must be in the range [0..1], was " +
+                        "$d"
+            )
         }
 
         if (d == 0.0 && (a == 0.0 || gamma == 0.0)) {
-            throw IllegalArgumentException("Parameter a or g is zero, the transfer function is constant")
+            throw IllegalArgumentException(
+                "Parameter a or g is zero, the transfer function is constant"
+            )
         }
 
         if (d >= 1.0 && c == 0.0) {
-            throw IllegalArgumentException("Parameter c is zero, the transfer function is constant")
+            throw IllegalArgumentException(
+                "Parameter c is zero, the transfer function is constant"
+            )
         }
 
         if ((a == 0.0 || gamma == 0.0) && c == 0.0) {
-            throw IllegalArgumentException("Parameter a or g is zero, and c is zero, the transfer function is constant")
+            throw IllegalArgumentException(
+                "Parameter a or g is zero," +
+                        " and c is zero, the transfer function is constant"
+            )
         }
 
         if (c < 0.0) {
@@ -76,7 +88,12 @@ data class TransferParameters(
         }
 
         if (a < 0.0 || gamma < 0.0) {
-            throw IllegalArgumentException("The transfer function must be positive or increasing")
+            throw IllegalArgumentException(
+                (
+                        "The transfer function must be " +
+                                "positive or increasing"
+                        )
+            )
         }
     }
 }

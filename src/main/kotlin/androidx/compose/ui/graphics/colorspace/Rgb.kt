@@ -16,6 +16,8 @@
 
 package androidx.compose.ui.graphics.colorspace
 
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.util.packFloats
 import kotlin.math.abs
 import kotlin.math.pow
 
@@ -51,7 +53,7 @@ import kotlin.math.pow
  * primaries and white point in the CIE XYZ space. The tristimulus XYZ values
  * are internally converted to xyY.
  *
- * [sRGB primaries and white point]({@docRoot}reference/android/images/graphics/colorspace_srgb.png)
+ * [sRGB primaries and white point](https://developer.android.com/reference/android/images/graphics/colorspace_srgb.png)
  *
  * ### Transfer functions
  *
@@ -113,7 +115,7 @@ import kotlin.math.pow
  * range `[-0.5..7.5]` while [ACES][ColorSpaces.Aces] can be used throughout
  * the range `[-65504, 65504]`.
  *
- * [Extended sRGB and its large range]({@docRoot}reference/android/images/graphics/colorspace_scrgb.png)
+ * [Extended sRGB and its large range](https://developer.android.com/reference/android/images/graphics/colorspace_scrgb.png)
  *
  * ### Converting between RGB color spaces
  *
@@ -185,8 +187,8 @@ internal constructor(
     primaries: FloatArray,
     val whitePoint: WhitePoint,
     transform: FloatArray?,
-    oetf: (Double) -> Double,
-    eotf: (Double) -> Double,
+    oetf: DoubleFunction,
+    eotf: DoubleFunction,
     private val min: Float,
     private val max: Float,
     /**
@@ -203,7 +205,7 @@ internal constructor(
      * [TransferParameters]
      */
     val transferParameters: TransferParameters?,
-    id: Int
+    id: Int,
 ) : ColorSpace(name, ColorModel.Rgb, id) {
 
     internal val primaries: FloatArray
@@ -231,7 +233,13 @@ internal constructor(
      * @see eotf
      * @see Rgb.transferParameters
      */
-    val oetf: (Double) -> Double = { x -> oetfOrig(x).coerceIn(min.toDouble(), max.toDouble()) }
+    val oetf: (Double) -> Double = { x ->
+        oetfOrig(x).coerceIn(min.toDouble(), max.toDouble())
+    }
+
+    internal val oetfFunc: DoubleFunction = DoubleFunction { x ->
+        oetfOrig(x).coerceIn(min.toDouble(), max.toDouble())
+    }
 
     internal val eotfOrig = eotf
 
@@ -254,7 +262,13 @@ internal constructor(
      * @see oetf
      * @see Rgb.transferParameters
      */
-    val eotf: (Double) -> Double = { x -> eotfOrig(x.coerceIn(min.toDouble(), max.toDouble())) }
+    val eotf: (Double) -> Double = { x ->
+        eotfOrig(x.coerceIn(min.toDouble(), max.toDouble()))
+    }
+
+    internal val eotfFunc = DoubleFunction { x ->
+        eotfOrig(x.coerceIn(min.toDouble(), max.toDouble()))
+    }
 
     override val isWideGamut: Boolean
     override val isSrgb: Boolean
@@ -364,19 +378,17 @@ internal constructor(
      *  * The minimum valid value is >= the maximum valid value.
      */
     constructor(
-        /*@Size(min = 1)*/
-        name: String,
-        /*@Size(9)*/
-        toXYZ: FloatArray,
+        /*@Size(min = 1)*/ name: String,
+        /*@Size(9)*/ toXYZ: FloatArray,
         oetf: (Double) -> Double,
-        eotf: (Double) -> Double
+        eotf: (Double) -> Double,
     ) : this(
         name,
         computePrimaries(toXYZ),
         computeWhitePoint(toXYZ),
         null,
-        oetf,
-        eotf,
+        DoubleFunction { x -> oetf(x) },
+        DoubleFunction { x -> eotf(x) },
         0.0f,
         1.0f,
         null,
@@ -417,16 +429,25 @@ internal constructor(
      *  * The minimum valid value is >= the maximum valid value.
      */
     constructor(
-        /*@Size(min = 1)*/
-        name: String,
-        /*@Size(min = 6, max = 9)*/
-        primaries: FloatArray,
+        /*@Size(min = 1)*/ name: String,
+        /*@Size(min = 6, max = 9)*/ primaries: FloatArray,
         whitePoint: WhitePoint,
         oetf: (Double) -> Double,
         eotf: (Double) -> Double,
         min: Float,
-        max: Float
-    ) : this(name, primaries, whitePoint, null, oetf, eotf, min, max, null, MinId)
+        max: Float,
+    ) : this(
+        name,
+        primaries,
+        whitePoint,
+        null,
+        DoubleFunction { x -> oetf(x) },
+        DoubleFunction { x -> eotf(x) },
+        min,
+        max,
+        null,
+        MinId
+    )
 
     /**
      * Creates a new RGB color space using a 3x3 column-major transform matrix.
@@ -445,11 +466,9 @@ internal constructor(
      *  * Gamma is negative.
      */
     constructor(
-        /*@Size(min = 1)*/
-        name: String,
-        /*@Size(9)*/
-        toXYZ: FloatArray,
-        function: TransferParameters
+        /*@Size(min = 1)*/ name: String,
+        /*@Size(9)*/ toXYZ: FloatArray,
+        function: TransferParameters,
     ) : this(name, computePrimaries(toXYZ), computeWhitePoint(toXYZ), function, MinId)
 
     /**
@@ -482,12 +501,10 @@ internal constructor(
      *  * The transfer parameters are invalid.
      */
     constructor(
-        /*@Size(min = 1)*/
-        name: String,
-        /*@Size(min = 6, max = 9)*/
-        primaries: FloatArray,
+        /*@Size(min = 1)*/ name: String,
+        /*@Size(min = 6, max = 9)*/ primaries: FloatArray,
         whitePoint: WhitePoint,
-        function: TransferParameters
+        function: TransferParameters,
     ) : this(name, primaries, whitePoint, function, MinId)
 
     /**
@@ -529,10 +546,10 @@ internal constructor(
         primaries: FloatArray,
         whitePoint: WhitePoint,
         function: TransferParameters,
-        id: Int
+        id: Int,
     ) : this(
         name, primaries, whitePoint, null,
-        if (function.e == 0.0 && function.f == 0.0) { x ->
+        if (function.e == 0.0 && function.f == 0.0) DoubleFunction { x ->
             rcpResponse(
                 x,
                 function.a,
@@ -541,13 +558,13 @@ internal constructor(
                 function.d,
                 function.gamma
             )
-        } else { x ->
+        } else DoubleFunction { x ->
             rcpResponse(
                 x, function.a, function.b, function.c, function.d, function.e,
                 function.f, function.gamma
             )
         },
-        if (function.e == 0.0 && function.f == 0.0) { x ->
+        if (function.e == 0.0 && function.f == 0.0) DoubleFunction { x ->
             response(
                 x,
                 function.a,
@@ -556,7 +573,7 @@ internal constructor(
                 function.d,
                 function.gamma
             )
-        } else { x ->
+        } else DoubleFunction { x ->
             response(
                 x, function.a, function.b, function.c, function.d, function.e,
                 function.f, function.gamma
@@ -584,11 +601,9 @@ internal constructor(
      * @see get
      */
     constructor(
-        /*@Size(min = 1)*/
-        name: String,
-        /*@Size(9)*/
-        toXYZ: FloatArray,
-        gamma: Double
+        /*@Size(min = 1)*/ name: String,
+        /*@Size(9)*/ toXYZ: FloatArray,
+        gamma: Double,
     ) : this(
         name, computePrimaries(toXYZ), computeWhitePoint(toXYZ), gamma, 0.0f, 1.0f,
         MinId
@@ -626,12 +641,10 @@ internal constructor(
      * @see get
      */
     constructor(
-        /*@Size(min = 1)*/
-        name: String,
-        /*@Size(min = 6, max = 9)*/
-        primaries: FloatArray,
+        /*@Size(min = 1)*/ name: String,
+        /*@Size(min = 6, max = 9)*/ primaries: FloatArray,
         whitePoint: WhitePoint,
-        gamma: Double
+        gamma: Double,
     ) : this(name, primaries, whitePoint, gamma, 0.0f, 1.0f, MinId)
 
     /**
@@ -678,13 +691,13 @@ internal constructor(
         gamma: Double,
         min: Float,
         max: Float,
-        id: Int
+        id: Int,
     ) : this(
         name, primaries, whitePoint, null,
         if (gamma == 1.0) DoubleIdentity
-        else { x -> (if (x < 0.0) 0.0 else x).pow(1.0 / gamma) },
+        else DoubleFunction { x -> (if (x < 0.0) 0.0 else x).pow(1.0 / gamma) },
         if (gamma == 1.0) DoubleIdentity
-        else { x -> (if (x < 0.0) 0.0 else x).pow(gamma) },
+        else DoubleFunction { x -> (if (x < 0.0) 0.0 else x).pow(gamma) },
         min,
         max,
         TransferParameters(gamma, 1.0, 0.0, 0.0, 0.0),
@@ -699,7 +712,7 @@ internal constructor(
     internal constructor(
         colorSpace: Rgb,
         transform: FloatArray,
-        whitePoint: WhitePoint
+        whitePoint: WhitePoint,
     ) : this(
         colorSpace.name, colorSpace.primaries, whitePoint, transform,
         colorSpace.oetfOrig, colorSpace.eotfOrig, colorSpace.min, colorSpace.max,
@@ -819,9 +832,9 @@ internal constructor(
      */
     /*@Size(min = 3)*/
     fun toLinear(/*@Size(min = 3)*/ v: FloatArray): FloatArray {
-        v[0] = eotf(v[0].toDouble()).toFloat()
-        v[1] = eotf(v[1].toDouble()).toFloat()
-        v[2] = eotf(v[2].toDouble()).toFloat()
+        v[0] = eotfFunc(v[0].toDouble()).toFloat()
+        v[1] = eotfFunc(v[1].toDouble()).toFloat()
+        v[2] = eotfFunc(v[2].toDouble()).toFloat()
         return v
     }
 
@@ -865,25 +878,64 @@ internal constructor(
      * @see toLinear
      */
     /*@Size(min = 3)*/
-    fun fromLinear(/*@Size(min = 3) */v: FloatArray): FloatArray {
-        v[0] = oetf(v[0].toDouble()).toFloat()
-        v[1] = oetf(v[1].toDouble()).toFloat()
-        v[2] = oetf(v[2].toDouble()).toFloat()
+    fun fromLinear(/*@Size(min = 3)*/ v: FloatArray): FloatArray {
+        v[0] = oetfFunc(v[0].toDouble()).toFloat()
+        v[1] = oetfFunc(v[1].toDouble()).toFloat()
+        v[2] = oetfFunc(v[2].toDouble()).toFloat()
         return v
     }
 
     override fun toXyz(v: FloatArray): FloatArray {
-        v[0] = eotf(v[0].toDouble()).toFloat()
-        v[1] = eotf(v[1].toDouble()).toFloat()
-        v[2] = eotf(v[2].toDouble()).toFloat()
+        v[0] = eotfFunc(v[0].toDouble()).toFloat()
+        v[1] = eotfFunc(v[1].toDouble()).toFloat()
+        v[2] = eotfFunc(v[2].toDouble()).toFloat()
         return mul3x3Float3(transform, v)
+    }
+
+    override fun toXy(v0: Float, v1: Float, v2: Float): Long {
+        val v00 = eotfFunc(v0.toDouble()).toFloat()
+        val v10 = eotfFunc(v1.toDouble()).toFloat()
+        val v20 = eotfFunc(v2.toDouble()).toFloat()
+
+        val x = mul3x3Float3_0(transform, v00, v10, v20)
+        val y = mul3x3Float3_1(transform, v00, v10, v20)
+
+        return packFloats(x, y)
+    }
+
+    override fun toZ(v0: Float, v1: Float, v2: Float): Float {
+        val v00 = eotfFunc(v0.toDouble()).toFloat()
+        val v10 = eotfFunc(v1.toDouble()).toFloat()
+        val v20 = eotfFunc(v2.toDouble()).toFloat()
+
+        val z = mul3x3Float3_2(transform, v00, v10, v20)
+
+        return z
+    }
+
+    override fun xyzaToColor(
+        x: Float,
+        y: Float,
+        z: Float,
+        a: Float,
+        colorSpace: ColorSpace,
+    ): Color {
+        var v0 = mul3x3Float3_0(inverseTransform, x, y, z)
+        var v1 = mul3x3Float3_1(inverseTransform, x, y, z)
+        var v2 = mul3x3Float3_2(inverseTransform, x, y, z)
+
+        v0 = oetfFunc(v0.toDouble()).toFloat()
+        v1 = oetfFunc(v1.toDouble()).toFloat()
+        v2 = oetfFunc(v2.toDouble()).toFloat()
+
+        return Color(v0, v1, v2, a, colorSpace)
     }
 
     override fun fromXyz(v: FloatArray): FloatArray {
         mul3x3Float3(inverseTransform, v)
-        v[0] = oetf(v[0].toDouble()).toFloat()
-        v[1] = oetf(v[1].toDouble()).toFloat()
-        v[2] = oetf(v[2].toDouble()).toFloat()
+        v[0] = oetfFunc(v[0].toDouble()).toFloat()
+        v[1] = oetfFunc(v[1].toDouble()).toFloat()
+        v[2] = oetfFunc(v[2].toDouble()).toFloat()
         return v
     }
 
@@ -927,7 +979,7 @@ internal constructor(
     // internal so that current.txt doesn't expose it: a 'private' companion object
     // is marked deprecated
     internal companion object {
-        private val DoubleIdentity: (Double) -> Double = { d -> d }
+        private val DoubleIdentity = DoubleFunction { d -> d }
 
         /**
          * Computes whether a color space is the sRGB color space or at least
@@ -947,11 +999,11 @@ internal constructor(
         private fun isSrgb(
             primaries: FloatArray,
             whitePoint: WhitePoint,
-            OETF: (Double) -> Double,
-            EOTF: (Double) -> Double,
+            OETF: DoubleFunction,
+            EOTF: DoubleFunction,
             min: Float,
             max: Float,
-            id: Int
+            id: Int,
         ): Boolean {
             if (id == 0) return true
             if (!compare(primaries, ColorSpaces.SrgbPrimaries)) {
@@ -990,8 +1042,8 @@ internal constructor(
 
         private fun compare(
             point: Double,
-            a: (Double) -> Double,
-            b: (Double) -> Double
+            a: DoubleFunction,
+            b: DoubleFunction,
         ): Boolean {
             val rA = a(point)
             val rB = b(point)
@@ -1016,7 +1068,7 @@ internal constructor(
         private fun isWideGamut(
             primaries: FloatArray,
             min: Float,
-            max: Float
+            max: Float,
         ): Boolean {
             return (
                     (
@@ -1281,7 +1333,7 @@ internal constructor(
          */
         private fun computeXYZMatrix(
             primaries: FloatArray,
-            whitePoint: WhitePoint
+            whitePoint: WhitePoint,
         ): FloatArray {
             val rx = primaries[0]
             val ry = primaries[1]
@@ -1321,4 +1373,12 @@ internal constructor(
             )
         }
     }
+}
+
+/**
+ * Java's DoubleUnaryOperator isn't available until API 24, so we'll use a substitute.
+ * When we bump minimum SDK versions, this should be removed and we should use Java's version.
+ */
+internal fun interface DoubleFunction {
+    operator fun invoke(double: Double): Double
 }
