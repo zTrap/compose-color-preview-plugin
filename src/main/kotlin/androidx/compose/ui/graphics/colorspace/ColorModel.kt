@@ -26,20 +26,22 @@ import androidx.compose.ui.util.unpackInt1
  * model is the [RGB][Rgb] color model which defines a color
  * as represented by a tuple of 3 numbers (red, green and blue).
  */
-@JvmInline
+/*@Immutable*/
+@kotlin.jvm.JvmInline
 value class ColorModel internal constructor(
     /**
      * pack both the number of components and an ordinal value to distinguish between
      * different ColorModel types that have the same number of components
      */
-    private val packedValue: Long
+    internal val packedValue: Long
 ) {
     /**
      * Returns the number of components for this color model.
      *
      * @return An integer between 1 and 4
      */
-    /*@IntRange(from = 1, to = 4)*/
+    /*@get:IntRange(from = 1, to = 4)*/
+    /*@Stable*/
     val componentCount: Int
         get() {
             return unpackInt1(packedValue)

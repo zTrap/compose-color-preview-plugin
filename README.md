@@ -19,9 +19,12 @@ It works with `androidx.compose.ui.graphics.Color` from
     - [x] Float x3 with color scheme function "constructor"
     - [x] Float x4 function "constructor"
     - [x] Float x4 with color scheme function "constructor"
+    - [x] hsl "constructor"
+    - [x] hsv "constructor"
 - [x] Show palette by clicking on preview to change color
     - [x] Change color with saving original numeral system
 - [x] Show preview in places fields usage with type `Color`
+- [x] Show preview for results of `compositeOver`, `copy`, `convert` and `lerp` functions
 
 ![Preview](./.github/preview.png)
 
@@ -29,8 +32,7 @@ It works with `androidx.compose.ui.graphics.Color` from
 
 Install it from the Jetbrains plugin repository within your IDE (**recommended**):
 
-- <kbd>File</kbd> > <kbd>Settings</kbd> > <kbd>Plugins</kbd> > <kbd>Browse repositories...</kbd> > <kbd>Search 'Color
-  preview'</kbd> > <kbd>Category 'Editor'</kbd>
+- <kbd>File</kbd> > <kbd>Settings</kbd> > <kbd>Plugins</kbd> > <kbd>Browse repositories...</kbd> > <kbd>Search 'Compose colors preview'</kbd>
 
 You can also download the JAR package from
 the [Jetbrains plugin repository](https://plugins.jetbrains.com/plugin/21298-compose-colors-preview) or
@@ -52,7 +54,7 @@ features [here](https://github.com/zTrap/compose-color-preview-plugin/issues).
 - [The Apache License Version 2.0](https://www.apache.org/licenses/LICENSE-2.0.txt)
 
 ```
-Copyright 2023 Peter Gulko (zTrap)
+Copyright 2023-2024 Peter Gulko (zTrap)
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

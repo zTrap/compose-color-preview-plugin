@@ -8,7 +8,7 @@ plugins {
 }
 
 val ideMinVersion = "241"
-val pluginMajorVersion = "0.0.3"
+val pluginMajorVersion = "0.0.4"
 
 group = "ru.ztrap.plugin.idea"
 version = "$pluginMajorVersion-$ideMinVersion"
