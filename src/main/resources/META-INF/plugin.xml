@@ -5,14 +5,29 @@
     <vendor url="https://github.com/zTrap">Peter Gulko (zTrap)</vendor>
 
     <change-notes><![CDATA[
-        <h2>New Features</h2>
+        <h3>New Features</h3>
         <ul>
-          <li>Added display of colored icon for using fields (chaining proxy fields is also supported)</li>
+          <li>
+            Preview is now renders for new functions:
+            <ul>
+                <li>compositeOver</li>
+                <li>convert</li>
+                <li>copy</li>
+                <li>lerp</li>
+                <li>Color.hsl</li>
+                <li>Color.hsv</li>
+            </ul>
+          </li>
         </ul>
-        <h2>Bug Fixes</h2>
+        <h3>Bug Fixes</h3>
         <ul>
-          <li>The property list now displays correctly when two or more colors are displayed on the same line</li>
+          <li>Preview is now renders correctly for constants from compiled dependencies</li>
+          <li>Preview is now renders for more places</li>
+          <li>Proxy field preview is now limited to val only</li>
         </ul>
+
+        <br><br>
+        <a href="https://github.com/zTrap/compose-color-preview-plugin/blob/main/CHANGELOG.md">Full changelog</a>
     ]]></change-notes>
 
     <description><![CDATA[
@@ -33,9 +48,11 @@
 
     <extensions defaultExtensionNs="com.intellij">
         <codeInsight.lineMarkerProvider
-            order="last"
             language="kotlin"
-            implementationClass="ru.ztrap.plugin.idea.compose.color.preview.ComposeColorLineMarkerProvider"/>
-        <colorProvider implementation="ru.ztrap.plugin.idea.compose.color.preview.ComposeColorProvider"/>
+            implementationClass="ru.ztrap.plugin.idea.compose.color.preview.line.marker.provider.ColorConstantsLineMarkerProvider"/>
+        <codeInsight.lineMarkerProvider
+            language="kotlin"
+            implementationClass="ru.ztrap.plugin.idea.compose.color.preview.line.marker.provider.ColorModifiersLineMarkerProvider"/>
+        <colorProvider implementation="ru.ztrap.plugin.idea.compose.color.preview.line.marker.provider.EditableColorLineMarkerProvider"/>
     </extensions>
 </idea-plugin>

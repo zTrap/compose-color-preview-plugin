@@ -24,6 +24,13 @@ package androidx.compose.ui.graphics.colorspace
  * @see Illuminant
  */
 data class WhitePoint(val x: Float, val y: Float) {
+    /**
+     * Illuminant for CIE XYZ white point
+     */
+    constructor(x: Float, y: Float, z: Float) : this(x, y, z, x + y + z)
+
+    @Suppress("UNUSED_PARAMETER")
+    private constructor(x: Float, y: Float, z: Float, sum: Float) : this(x / sum, y / sum)
 
     /**
      * Converts a value from CIE xyY to CIE XYZ. Y is assumed to be 1 so the
