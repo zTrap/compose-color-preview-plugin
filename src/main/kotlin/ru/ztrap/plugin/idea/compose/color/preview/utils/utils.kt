@@ -4,9 +4,13 @@ import androidx.compose.ui.graphics.Color as ComposeColor
 import java.awt.Color as AwtColor
 import androidx.compose.ui.graphics.colorspace.ColorSpace
 import androidx.compose.ui.graphics.colorspace.ColorSpaces
+import com.intellij.codeInsight.daemon.MergeableLineMarkerInfo
 import com.intellij.psi.PsiElement
 import com.intellij.psi.tree.IElementType
 import com.intellij.psi.util.PsiTreeUtil
+import com.intellij.ui.scale.JBUIScale
+import com.intellij.util.ui.ColorsIcon
+import javax.swing.Icon
 import org.jetbrains.kotlin.KtNodeTypes
 import org.jetbrains.kotlin.asJava.namedUnwrappedElement
 import org.jetbrains.kotlin.idea.base.psi.kotlinFqName
@@ -36,6 +40,7 @@ import org.jetbrains.kotlin.types.TypeUtils
 import ru.ztrap.plugin.idea.compose.color.preview.ColorFunction
 import ru.ztrap.plugin.idea.compose.color.preview.ColorsExpressionsPack
 import ru.ztrap.plugin.idea.compose.color.preview.ColorsValueArgumentsPack
+import ru.ztrap.plugin.idea.compose.color.preview.line.marker.provider.ColorAwareLineMarkerInfo
 
 private const val COMPOSE_COLOR_PACKAGE = "androidx.compose.ui.graphics"
 private const val COMPOSE_COLOR_CTOR_FQ_NAME = "$COMPOSE_COLOR_PACKAGE.Color"
@@ -89,6 +94,11 @@ private val KtCallExpression.composeColorFqName: String?
         ?.kotlinFqOrCtorName
         ?.asString()
 
+@Suppress("UnusedReceiverParameter") // limit the scope of usage
+internal inline fun <reified T : ColorAwareLineMarkerInfo> T.getPreScaledCommonIcon(
+    infos: List<MergeableLineMarkerInfo<*>>,
+): Icon = JBUIScale.scaleIcon(ColorsIcon(12, *Array(infos.size) { infos[it].cast<T>().color }))
+
 internal val PsiElement.isInFileHeader: Boolean
     get() = haveParentOfType<KtFileAnnotationList>() ||
             haveParentOfType<KtPackageDirective>() ||
@@ -104,7 +114,7 @@ internal fun isComposeColorFun(element: KtCallExpression): Boolean {
     return element.composeColorFqName?.let { it in COMPOSE_COLOR_CREATOR_FUNCTIONS } ?: false
 }
 
-internal fun isComposeModifierFun(element: KtCallExpression): Boolean {
+internal fun isComposeColorModifierFun(element: KtCallExpression): Boolean {
     return element.composeColorFqName?.let { it in COMPOSE_COLOR_MODIFIER_FUNCTIONS } ?: false
 }
 

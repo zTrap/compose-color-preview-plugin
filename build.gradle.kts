@@ -8,7 +8,7 @@ plugins {
 }
 
 val ideMinVersion = "241"
-val pluginMajorVersion = "0.0.4"
+val pluginMajorVersion = "0.0.5"
 
 group = "ru.ztrap.plugin.idea"
 version = "$pluginMajorVersion-$ideMinVersion"
@@ -22,11 +22,9 @@ intellij {
     version = "2024.1"
     type = "IC"
 
-    plugins.set(
-        listOf(
-            "com.intellij.java",
-            "org.jetbrains.kotlin",
-        ),
+    plugins = listOf(
+        "com.intellij.java",
+        "org.jetbrains.kotlin",
     )
 }
 

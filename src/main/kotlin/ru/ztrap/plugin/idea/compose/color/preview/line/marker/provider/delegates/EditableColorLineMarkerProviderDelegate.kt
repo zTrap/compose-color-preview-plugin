@@ -1,11 +1,14 @@
-package ru.ztrap.plugin.idea.compose.color.preview.line.marker.provider
+package ru.ztrap.plugin.idea.compose.color.preview.line.marker.provider.delegates
 
 import androidx.compose.ui.graphics.Color
-import com.intellij.openapi.editor.ElementColorProvider
+import com.intellij.codeInsight.daemon.GutterIconNavigationHandler
+import com.intellij.ide.IdeBundle
+import com.intellij.openapi.application.runWriteAction
 import com.intellij.psi.PsiElement
 import com.intellij.psi.impl.source.tree.LeafPsiElement
-import org.jetbrains.kotlin.idea.KotlinLanguage
-import org.jetbrains.kotlin.lexer.KtTokens
+import com.intellij.ui.ColorChooserService
+import com.intellij.ui.awt.RelativePoint
+import java.awt.event.MouseEvent
 import org.jetbrains.kotlin.psi.KtBinaryExpression
 import org.jetbrains.kotlin.psi.KtBlockExpression
 import org.jetbrains.kotlin.psi.KtCallExpression
@@ -19,9 +22,9 @@ import org.jetbrains.kotlin.psi.KtReturnExpression
 import org.jetbrains.kotlin.psi.KtValueArgument
 import org.jetbrains.kotlin.psi.psiUtil.getChildOfType
 import org.jetbrains.kotlin.psi.psiUtil.getParentOfType
+import ru.ztrap.plugin.idea.compose.color.preview.line.marker.provider.ColorAwareLineMarkerInfo
 import ru.ztrap.plugin.idea.compose.color.preview.utils.createColorFunction
 import ru.ztrap.plugin.idea.compose.color.preview.utils.isComposeColorFun
-import ru.ztrap.plugin.idea.compose.color.preview.utils.isInFileHeader
 import ru.ztrap.plugin.idea.compose.color.preview.utils.toAwtColor
 
 private val ALLOWED_COLOR_SOURCE_PARENTS = arrayOf(
@@ -33,21 +36,26 @@ private val ALLOWED_COLOR_SOURCE_PARENTS = arrayOf(
     KtValueArgument::class,
 )
 
-class EditableColorLineMarkerProvider : ElementColorProvider {
+internal data object EditableColorLineMarkerProviderDelegate : LineMarkerProviderDelegate() {
 
-    override fun getColorFrom(element: PsiElement): java.awt.Color? {
-        if (element.language != KotlinLanguage.INSTANCE) return null
-        if (element !is LeafPsiElement) return null
-        if (element.elementType != KtTokens.IDENTIFIER) return null
-        if (element.isInFileHeader) return null
+    override val option = createOption("Color chooser")
 
-        return findColorSource(element)
+    override fun getLineMarkerInfo(leaf: LeafPsiElement): ColorAwareLineMarkerInfo? {
+        return findColorSource(leaf)
             ?.createColorFunction()
             ?.getColor()
             ?.toAwtColor()
+            ?.let { color ->
+                EditableColorLineMarkerInfo(
+                    color = color,
+                    message = IdeBundle.message("dialog.title.choose.color"),
+                    anchor = leaf,
+                    colorApplier = ::setColorTo,
+                )
+            }
     }
 
-    override fun setColorTo(element: PsiElement, awtColor: java.awt.Color) {
+    private fun setColorTo(element: LeafPsiElement, awtColor: java.awt.Color) {
         val colorFunction = findColorSource(element)?.createColorFunction() ?: return
         val currentComposeColor = colorFunction.getColor() ?: return
         val newComposeColor = Color(awtColor.red, awtColor.green, awtColor.blue, awtColor.alpha)
@@ -70,5 +78,35 @@ class EditableColorLineMarkerProvider : ElementColorProvider {
         }
 
         return callExpression?.takeIf(::isComposeColorFun)
+    }
+
+    private class EditableColorLineMarkerInfo(
+        color: java.awt.Color,
+        message: String,
+        anchor: LeafPsiElement,
+        colorApplier: (element: LeafPsiElement, color: java.awt.Color) -> Unit,
+    ) : ColorAwareLineMarkerInfo(
+        color = color,
+        anchor = anchor,
+        tooltipText = message,
+        navHandler = NavigationHandler(anchor, color, colorApplier),
+    )
+
+    private class NavigationHandler(
+        private val anchor: LeafPsiElement,
+        private val color: java.awt.Color,
+        private val colorApplier: (element: LeafPsiElement, color: java.awt.Color) -> Unit,
+    ) : GutterIconNavigationHandler<PsiElement> {
+        override fun navigate(e: MouseEvent, elt: PsiElement) {
+            if (!elt.isWritable) return
+
+            ColorChooserService.instance.showPopup(
+                project = anchor.project,
+                currentColor = color,
+                listener = { c, _ -> runWriteAction { colorApplier(anchor, c) } },
+                location = RelativePoint(e.component, e.point),
+                showAlpha = true,
+            )
+        }
     }
 }
