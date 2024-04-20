@@ -1,5 +1,20 @@
 # Change Log
 
+## [0.0.5] - 20-04-2024
+
+### Added
+
+- Preview icons are now divided to 3 groups:
+  - Editable color
+  - Constants usage
+  - Result of modifier functions
+- Each group can now be enabled/disabled in the settings (Settings/Preferences | Editor | General | Gutter Icons)
+
+### Fixed
+
+- File analysis time has been optimized by merging 3 psi-tree processors into 1
+- Fixed icons alignment
+
 ## [0.0.4] - 15-04-2024
 
 ### Added
