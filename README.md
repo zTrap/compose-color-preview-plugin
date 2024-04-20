@@ -1,12 +1,12 @@
-[![Plugin version](https://img.shields.io/jetbrains/plugin/v/21298-compose-colors-preview)](https://plugins.jetbrains.com/plugin/21298-compose-colors-preview)
+[![Plugin version](https://img.shields.io/jetbrains/plugin/v/21298-compose-color-preview)](https://plugins.jetbrains.com/plugin/21298-compose-color-preview)
 
 # ![Preview](./src/main/resources/META-INF/pluginIcon.svg) Compose color preview plugin for JetBrains IDE family
 
-This plugin draws colors on editor's gutter. You can modify colors by clicking on icons
+This plugin draws colors on editor's gutter. You can modify colors by clicking on the icons
 
 It works with `androidx.compose.ui.graphics.Color` from
-[Jetpack Compose](https://developer.android.com/jetpack/compose) or
-[Compose Multiplatform](https://www.jetbrains.com/ru-ru/lp/compose-mpp)
+[Jetpack Compose](https://developer.android.com/develop/ui/compose) or
+[Compose Multiplatform](https://www.jetbrains.com/lp/compose-multiplatform)
 
 ## Features
 
@@ -32,15 +32,14 @@ It works with `androidx.compose.ui.graphics.Color` from
 
 Install it from the Jetbrains plugin repository within your IDE (**recommended**):
 
-- <kbd>File</kbd> > <kbd>Settings</kbd> > <kbd>Plugins</kbd> > <kbd>Browse repositories...</kbd> > <kbd>Search 'Compose colors preview'</kbd>
+- <kbd>Settings/Preferences</kbd> > <kbd>Marketplace</kbd> > <kbd>Search 'Compose color preview'</kbd>
 
 You can also download the JAR package from
-the [Jetbrains plugin repository](https://plugins.jetbrains.com/plugin/21298-compose-colors-preview) or
+the [Jetbrains plugin repository](https://plugins.jetbrains.com/plugin/21298-compose-color-preview) or
 from [GitHub Releases](https://github.com/zTrap/compose-color-preview-plugin/releases) and add it manually to your
 plugins:
 
-- <kbd>File</kbd> > <kbd>Settings</kbd> > <kbd>Preferences</kbd> > <kbd>Plugins</kbd> > <kbd>⚙️</kbd> > <kbd>Install
-  plugin from disk...</kbd>
+- <kbd>Settings/Preferences</kbd> > <kbd>Plugins</kbd> > <kbd>⚙️</kbd> > <kbd>Install plugin from disk...</kbd>
 
 ## Contribution
 
@@ -51,7 +50,7 @@ features [here](https://github.com/zTrap/compose-color-preview-plugin/issues).
 
 ## License
 
-- [The Apache License Version 2.0](https://www.apache.org/licenses/LICENSE-2.0.txt)
+- [The Apache License Version 2.0](https://www.apache.org/licenses/LICENSE-2.0)
 
 ```
 Copyright 2023-2024 Peter Gulko (zTrap)

@@ -1,6 +1,6 @@
 <idea-plugin>
     <id>ru.ztrap.plugin.idea.compose-color-preview</id>
-    <name>Compose colors preview</name>
+    <name>Compose color preview</name>
     <category>Editor</category>
     <vendor url="https://github.com/zTrap">Peter Gulko (zTrap)</vendor>
 
@@ -8,22 +8,18 @@
         <h3>New Features</h3>
         <ul>
           <li>
-            Preview is now renders for new functions:
+            Preview icons are now divided to 3 groups:
             <ul>
-                <li>compositeOver</li>
-                <li>convert</li>
-                <li>copy</li>
-                <li>lerp</li>
-                <li>Color.hsl</li>
-                <li>Color.hsv</li>
+                <li>Editable color</li>
+                <li>Constants usage</li>
+                <li>Result of modifier functions</li>
             </ul>
           </li>
+          <li>Each group can now be enabled/disabled in the settings (Settings/Preferences | Editor | General | Gutter Icons)</li>
         </ul>
         <h3>Bug Fixes</h3>
         <ul>
-          <li>Preview is now renders correctly for constants from compiled dependencies</li>
-          <li>Preview is now renders for more places</li>
-          <li>Proxy field preview is now limited to val only</li>
+          <li>File analysis time has been optimized by merging 3 psi-tree processors into 1</li>
         </ul>
 
         <br><br>
@@ -31,12 +27,12 @@
     ]]></change-notes>
 
     <description><![CDATA[
-        <h1>Compose colors preview.</h1>
+        <h1>Compose color preview.</h1>
         <p>This plugin draws colors on editor's gutter. You can modify colors by clicking on icons!</p>
 
         <p>It works with <code>androidx.compose.ui.graphics.Color</code> from
-        <a href="https://developer.android.com/jetpack/compose">Jetpack Compose</a> or
-        <a href="https://www.jetbrains.com/ru-ru/lp/compose-mpp/">Compose Multiplatform</a></p>
+        <a href="https://developer.android.com/develop/ui/compose">Jetpack Compose</a> or
+        <a href="https://www.jetbrains.com/lp/compose-multiplatform">Compose Multiplatform</a></p>
 
         <br><br>
         <a href="https://github.com/zTrap/compose-color-preview-plugin">GitHub</a> | <a href="https://github.com/zTrap/compose-color-preview-plugin/issues">Issues</a>
@@ -49,10 +45,6 @@
     <extensions defaultExtensionNs="com.intellij">
         <codeInsight.lineMarkerProvider
             language="kotlin"
-            implementationClass="ru.ztrap.plugin.idea.compose.color.preview.line.marker.provider.ColorConstantsLineMarkerProvider"/>
-        <codeInsight.lineMarkerProvider
-            language="kotlin"
-            implementationClass="ru.ztrap.plugin.idea.compose.color.preview.line.marker.provider.ColorModifiersLineMarkerProvider"/>
-        <colorProvider implementation="ru.ztrap.plugin.idea.compose.color.preview.line.marker.provider.EditableColorLineMarkerProvider"/>
+            implementationClass="ru.ztrap.plugin.idea.compose.color.preview.line.marker.provider.ComposeColorPreviewLineMarkerProvider"/>
     </extensions>
 </idea-plugin>
