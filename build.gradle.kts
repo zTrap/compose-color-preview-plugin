@@ -8,7 +8,7 @@ plugins {
 }
 
 val ideMinVersion = "223"
-val pluginMajorVersion = "0.0.5"
+val pluginMajorVersion = "0.0.6"
 
 group = "ru.ztrap.plugin.idea"
 version = "$pluginMajorVersion-$ideMinVersion"
@@ -48,7 +48,7 @@ tasks {
     patchPluginXml {
         version = project.version.toString()
         sinceBuild = ideMinVersion
-        untilBuild = "231.*"
+        untilBuild = "223.*"
     }
 
     signPlugin {
