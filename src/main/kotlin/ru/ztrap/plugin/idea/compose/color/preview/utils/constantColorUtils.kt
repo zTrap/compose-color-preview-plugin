@@ -11,7 +11,7 @@ import org.jetbrains.kotlin.psi.psiUtil.getParentOfType
 internal fun findColorConstantExpression(element: PsiElement): KtCallExpression? {
     return element.getParentOfType<KtNameReferenceExpression>(true)
         ?.let(::resolveNameReference)
-        ?.takeIf(::isComposeColorFun)
+        ?.takeIf(KtCallExpression::isComposeColorFun)
 }
 
 internal fun resolveNameReference(element: KtNameReferenceExpression): KtCallExpression? {

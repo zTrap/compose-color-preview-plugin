@@ -6,9 +6,6 @@ import org.jetbrains.kotlin.psi.KtValueArgument
 import ru.ztrap.plugin.idea.compose.color.preview.ColorsExpressionsPack
 import ru.ztrap.plugin.idea.compose.color.preview.ColorsValueArgumentsPack
 
-private const val HEX_FORMAT_PREFIX = "0x"
-private const val HEX_FORMAT_RADIX = 16
-
 internal fun KtPsiFactory.createNewIntExpressionsPack(
     pack: ColorsValueArgumentsPack,
     colorComponents: FloatArray,
@@ -109,21 +106,20 @@ internal fun KtPsiFactory.createNewIntExpression(argument: KtValueArgument, valu
     return createExpression(text)
 }
 
-internal fun KtPsiFactory.createAlphaIntArgument(name: String? = null, value: Float): KtValueArgument {
-    val newValue = buildString {
-        name?.let {
-            append(it)
-            append(" = ")
-        }
-
-        append(HEX_FORMAT_PREFIX)
-        append(fractionToHex(value).toUInt().toString(HEX_FORMAT_RADIX))
-    }
-    return createArgument(newValue)
+internal fun KtPsiFactory.createAlphaIntArgument(value: Float): KtValueArgument {
+    return createArgument(createIntString(COMPOSE_ARG_NAME_ALPHA, value))
 }
 
-internal fun KtPsiFactory.createAlphaFloatArgument(name: String? = null, value: Float): KtValueArgument {
-    return createArgument(createFloatString(name, value))
+internal fun KtPsiFactory.createIntArgument(value: Float): KtValueArgument {
+    return createArgument(createIntString(value = value))
+}
+
+internal fun KtPsiFactory.createAlphaFloatArgument(value: Float): KtValueArgument {
+    return createArgument(createFloatString(COMPOSE_ARG_NAME_ALPHA, value))
+}
+
+internal fun KtPsiFactory.createFloatArgument(value: Float): KtValueArgument {
+    return createArgument(createFloatString(value = value))
 }
 
 private fun KtPsiFactory.createNewFloatExpression(name: String? = null, value: Float): KtExpression {
@@ -137,4 +133,13 @@ private fun createFloatString(name: String? = null, value: Float): String = buil
     }
     append(value)
     append("f")
+}
+
+private fun createIntString(name: String? = null, value: Float): String = buildString {
+    name?.let {
+        append(it)
+        append(" = ")
+    }
+    append(HEX_FORMAT_PREFIX)
+    append(fractionToHex(value).toUInt().toString(HEX_FORMAT_RADIX))
 }

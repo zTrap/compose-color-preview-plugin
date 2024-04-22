@@ -7,9 +7,10 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.impl.source.tree.LeafPsiElement
 import com.intellij.ui.scale.JBUIScale
 import com.intellij.util.ui.ColorIcon
+import com.intellij.util.ui.ColorsIcon
 import java.awt.Color
 import javax.swing.Icon
-import ru.ztrap.plugin.idea.compose.color.preview.utils.getPreScaledCommonIcon
+import ru.ztrap.plugin.idea.compose.color.preview.utils.cast
 
 internal abstract class ColorAwareLineMarkerInfo(
     val color: Color,
@@ -25,11 +26,10 @@ internal abstract class ColorAwareLineMarkerInfo(
     /* alignment = */ GutterIconRenderer.Alignment.LEFT,
     /* accessibleNameProvider = */ { tooltipText },
 ) {
-    override fun canMergeWith(info: MergeableLineMarkerInfo<*>): Boolean {
-        return this::class.isInstance(info)
-    }
+    override fun canMergeWith(info: MergeableLineMarkerInfo<*>): Boolean = javaClass.isInstance(info)
 
     override fun getCommonIcon(infos: MutableList<out MergeableLineMarkerInfo<*>>): Icon {
-        return getPreScaledCommonIcon(infos)
+        val colors = Array(infos.size) { infos[it].cast<ColorAwareLineMarkerInfo>().color }
+        return JBUIScale.scaleIcon(ColorsIcon(12, *colors))
     }
 }

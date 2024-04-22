@@ -32,7 +32,8 @@ It works with `androidx.compose.ui.graphics.Color` from
 
 Install it from the Jetbrains plugin repository within your IDE (**recommended**):
 
-- <kbd>Settings/Preferences</kbd> > <kbd>Plugins</kbd> > <kbd>Marketplace</kbd> > <kbd>Search 'Compose color preview'</kbd>
+- <kbd>Settings/Preferences</kbd> > <kbd>Plugins</kbd> > <kbd>Marketplace</kbd> > <kbd>Search 'Compose color
+  preview'</kbd>
 
 You can also download the JAR package from
 the [Jetbrains plugin repository](https://plugins.jetbrains.com/plugin/21298-compose-color-preview) or
@@ -40,6 +41,31 @@ from [GitHub Releases](https://github.com/zTrap/compose-color-preview-plugin/rel
 plugins:
 
 - <kbd>Settings/Preferences</kbd> > <kbd>Plugins</kbd> > <kbd>⚙️</kbd> > <kbd>Install plugin from disk...</kbd>
+
+## FAQ
+
+<details>
+  <summary>I have a duplicate preview in the color declaration line in Android Studio. How to fix it?</summary>
+  <br/>
+  You can simply disable one of the previews. 
+  Go to <kbd>Settings/Preferences</kbd> > <kbd>Editor</kbd> > <kbd>General</kbd> > <kbd>Gutter Icons</kbd> and disable 
+  "Compose color picker" from "Jetpack compose" section or "Color preview" from "Compose color preview" section
+</details>
+<br/>
+<details>
+  <summary>Starting from IDEA 2024.1 colors list order in popup is reversed. Can you fix it?</summary>
+  <br/>
+  Unfortunately, no. It's Intellij IDEA Platform bug and <a href="https://youtrack.jetbrains.com/issue/IJPL-26348/Reversed-items-order-in-line-markers-popup">the issue</a> 
+  is created. So we can only wait for a fix from JetBrains
+  <br/>
+</details>
+<br/>
+<details>
+  <summary>Hex in color picker have wrong pattern. Can you fix it?</summary>
+  <br/>
+  Yes, but it requires a complete rewrite of the color picker popup which is not what I want to do. 
+  A request for this feature has been <a href="https://youtrack.jetbrains.com/issue/IJPL-148574/Provide-the-ability-to-configure-the-hex-pattern-for-the-color-picker-in-gutter">submitted</a> to JetBrains, and we need to wait for a reaction
+</details>
 
 ## Contribution
 

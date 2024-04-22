@@ -1,5 +1,16 @@
 # Change Log
 
+## [0.0.6] - 21-04-2024
+
+### Added
+
+- Small optimization for psi-tree processing
+
+### Fixed
+
+- Fixed `lerp` preview with non-default argument order
+- Removed overlap of supported IDE versions between plugin versions
+
 ## [0.0.5] - 20-04-2024
 
 ### Added
