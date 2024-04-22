@@ -77,7 +77,7 @@ internal data object EditableColorLineMarkerProviderDelegate : LineMarkerProvide
             else -> null
         }
 
-        return callExpression?.takeIf(::isComposeColorFun)
+        return callExpression?.takeIf(KtCallExpression::isComposeColorFun)
     }
 
     private class EditableColorLineMarkerInfo(

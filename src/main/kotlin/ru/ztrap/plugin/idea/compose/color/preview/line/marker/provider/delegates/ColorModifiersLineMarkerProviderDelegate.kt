@@ -36,7 +36,7 @@ internal data object ColorModifiersLineMarkerProviderDelegate : LineMarkerProvid
     private fun findModifierExpression(element: LeafPsiElement): KtCallExpression? {
         return element.getParentOfType<KtCallExpression>(true)
             ?.takeIf { it.getChildOfType<KtNameReferenceExpression>()?.getIdentifier() == element }
-            ?.takeIf(::isComposeColorModifierFun)
+            ?.takeIf(KtCallExpression::isComposeColorModifierFun)
     }
 
     private class ColorModifierLineMarkerInfo(

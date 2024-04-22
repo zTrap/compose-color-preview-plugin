@@ -13,7 +13,7 @@ import ru.ztrap.plugin.idea.compose.color.preview.line.marker.provider.delegates
 import ru.ztrap.plugin.idea.compose.color.preview.utils.isInFileHeader
 
 class ComposeColorPreviewLineMarkerProvider : LineMarkerProviderDescriptor() {
-    private val delegates = listOf(
+    private val delegates = arrayOf(
         EditableColorLineMarkerProviderDelegate,
         ColorConstantsLineMarkerProviderDelegate,
         ColorModifiersLineMarkerProviderDelegate,
@@ -28,17 +28,19 @@ class ComposeColorPreviewLineMarkerProvider : LineMarkerProviderDescriptor() {
         elements: MutableList<out PsiElement>,
         result: MutableCollection<in LineMarkerInfo<*>>,
     ) {
+        if (elements.firstOrNull()?.language != KotlinLanguage.INSTANCE) return
+
         val settings = LineMarkerSettings.getSettings()
         elements.asSequence()
-            .filter { it.language == KotlinLanguage.INSTANCE }
             .filterIsInstance<LeafPsiElement>()
             .filter { it.elementType == KtTokens.IDENTIFIER }
-            .filterNot { it.isInFileHeader }
-            .flatMap { leaf ->
-                delegates.filter { settings.isEnabled(it.option) }
-                    .map { it.getLineMarkerInfo(leaf) }
+            .filterNot(LeafPsiElement::isInFileHeader)
+            .forEach { leaf ->
+                for (delegate in delegates) {
+                    if (settings.isEnabled(delegate.option)) {
+                        delegate.getLineMarkerInfo(leaf)?.let(result::add)
+                    }
+                }
             }
-            .filterNotNull()
-            .toCollection(result)
     }
 }
