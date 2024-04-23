@@ -1,21 +1,20 @@
 package ru.ztrap.plugin.idea.compose.color.preview.utils
 
-import com.intellij.psi.PsiElement
-import org.jetbrains.kotlin.idea.intentions.callExpression
+import com.intellij.psi.impl.source.tree.LeafPsiElement
 import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
 import org.jetbrains.kotlin.psi.KtNameReferenceExpression
 import org.jetbrains.kotlin.psi.KtProperty
-import org.jetbrains.kotlin.psi.psiUtil.getParentOfType
+import org.jetbrains.kotlin.psi.psiUtil.getStrictParentOfType
 
-internal fun findColorConstantExpression(element: PsiElement): KtCallExpression? {
-    return element.getParentOfType<KtNameReferenceExpression>(true)
+internal fun findColorConstantExpression(leaf: LeafPsiElement): KtCallExpression? {
+    return leaf.getStrictParentOfType<KtNameReferenceExpression>()
         ?.let(::resolveNameReference)
         ?.takeIf(KtCallExpression::isComposeColorFun)
 }
 
-internal fun resolveNameReference(element: KtNameReferenceExpression): KtCallExpression? {
-    return when (val mainReference = element.resolveMainReference()?.navigationElement) {
+internal fun resolveNameReference(reference: KtNameReferenceExpression): KtCallExpression? {
+    return when (val mainReference = reference.resolveMainReference()?.navigationElement) {
         is KtProperty -> resolveKtProperty(mainReference)
         else -> null
     }
@@ -28,7 +27,12 @@ private fun resolveKtProperty(element: KtProperty): KtCallExpression? {
     return when (expression) {
         is KtCallExpression -> expression
         is KtNameReferenceExpression -> resolveNameReference(expression)
-        is KtDotQualifiedExpression -> expression.callExpression
+        is KtDotQualifiedExpression -> when (val selector = expression.selectorExpression) {
+            is KtNameReferenceExpression -> resolveNameReference(selector)
+            is KtCallExpression -> selector
+            else -> null
+        }
+
         else -> null
     }
 }

@@ -1,5 +1,12 @@
 # Change Log
 
+## [0.0.7] - 23-04-2024
+
+### Fixed
+- Fixed icons duplication when creator function have named parameters
+- Fixed rendering of `lerp`, `compositeOver` and `convert` functions result
+- Fixed preview rendering for proxy-properties with getter
+
 ## [0.0.6] - 21-04-2024
 
 ### Added

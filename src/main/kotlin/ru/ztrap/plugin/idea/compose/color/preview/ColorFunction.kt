@@ -13,7 +13,6 @@ import org.jetbrains.kotlin.psi.KtValueArgumentList
 import org.jetbrains.kotlin.psi.psiUtil.astReplace
 import ru.ztrap.plugin.idea.compose.color.preview.utils.ARGB_NAMES
 import ru.ztrap.plugin.idea.compose.color.preview.utils.LERP_NAMES
-import ru.ztrap.plugin.idea.compose.color.preview.utils.cast
 import ru.ztrap.plugin.idea.compose.color.preview.utils.createAlphaFloatArgument
 import ru.ztrap.plugin.idea.compose.color.preview.utils.createAlphaIntArgument
 import ru.ztrap.plugin.idea.compose.color.preview.utils.createFloatArgument
@@ -142,8 +141,7 @@ internal sealed class ColorFunction(protected val callExpression: KtCallExpressi
                 argumentsPack.replace(expressionsPack)
 
                 if (color.alpha.isMaxComponent()) {
-                    val alphaArg = argumentsPack.cast<ColorsValueArgumentsPack.ARGB>().alpha
-                    argumentList?.removeArgument(alphaArg)
+                    argumentList?.removeArgument(argumentsPack.alpha)
                 }
             }
         }
@@ -212,8 +210,7 @@ internal sealed class ColorFunction(protected val callExpression: KtCallExpressi
                 argumentsPack.replace(expressionsPack)
 
                 if (color.alpha.isMaxComponent()) {
-                    val alphaArg = argumentsPack.cast<ColorsValueArgumentsPack.ARGB>().alpha
-                    argumentList?.removeArgument(alphaArg)
+                    argumentList?.removeArgument(argumentsPack.alpha)
                 }
             }
         }
@@ -300,11 +297,12 @@ internal sealed class ColorFunction(protected val callExpression: KtCallExpressi
         override fun setNewColor(color: Color, factory: KtPsiFactory) {
             val argumentsPack = arguments.getPackedHSLA()
             val expressionsPack = factory.createNewFloatExpressionsPack(argumentsPack, color.getComponents().toHsl())
-            runWriteAction { argumentsPack.replace(expressionsPack) }
+            runWriteAction {
+                argumentsPack.replace(expressionsPack)
 
-            if (color.alpha.isMaxComponent()) {
-                val alphaArg = argumentsPack.cast<ColorsValueArgumentsPack.ARGB>().alpha
-                argumentList?.removeArgument(alphaArg)
+                if (color.alpha.isMaxComponent()) {
+                    argumentList?.removeArgument(argumentsPack.alpha)
+                }
             }
         }
     }
@@ -394,8 +392,7 @@ internal sealed class ColorFunction(protected val callExpression: KtCallExpressi
                 argumentsPack.replace(expressionsPack)
 
                 if (color.alpha.isMaxComponent()) {
-                    val alphaArg = argumentsPack.cast<ColorsValueArgumentsPack.ARGB>().alpha
-                    argumentList?.removeArgument(alphaArg)
+                    argumentList?.removeArgument(argumentsPack.alpha)
                 }
             }
         }
