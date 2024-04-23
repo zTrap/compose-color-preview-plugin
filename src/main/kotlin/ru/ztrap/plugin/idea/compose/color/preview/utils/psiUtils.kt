@@ -2,10 +2,12 @@ package ru.ztrap.plugin.idea.compose.color.preview.utils
 
 import androidx.compose.ui.graphics.colorspace.ColorSpace
 import androidx.compose.ui.graphics.colorspace.ColorSpaces
+import com.intellij.openapi.util.Key
 import com.intellij.psi.PsiElement
 import com.intellij.psi.impl.source.tree.LeafPsiElement
 import com.intellij.psi.tree.IElementType
 import com.intellij.psi.util.PsiTreeUtil
+import com.intellij.psi.util.siblings
 import org.jetbrains.kotlin.KtNodeTypes
 import org.jetbrains.kotlin.asJava.namedUnwrappedElement
 import org.jetbrains.kotlin.idea.base.psi.kotlinFqName
@@ -35,6 +37,12 @@ import org.jetbrains.kotlin.types.TypeUtils
 import ru.ztrap.plugin.idea.compose.color.preview.ColorFunction
 import ru.ztrap.plugin.idea.compose.color.preview.ColorsExpressionsPack
 import ru.ztrap.plugin.idea.compose.color.preview.ColorsValueArgumentsPack
+
+internal val KEY_COMPOSE_COLOR_FQ = Key.create<KtCallExpression>("COMPOSE_COLOR_FQ")
+
+internal inline fun <reified T : PsiElement> PsiElement.firstSiblingOfTypeOrNull(forward: Boolean = true): T? {
+    return siblings(forward).filterIsInstance<T>().firstOrNull()
+}
 
 internal fun LeafPsiElement.isInFileHeader(): Boolean {
     return haveParentOfType<KtFileAnnotationList>() ||

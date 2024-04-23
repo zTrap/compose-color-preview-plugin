@@ -20,32 +20,30 @@ import org.jetbrains.kotlin.psi.KtPropertyAccessor
 import org.jetbrains.kotlin.psi.KtPsiFactory
 import org.jetbrains.kotlin.psi.KtReturnExpression
 import org.jetbrains.kotlin.psi.KtValueArgument
+import org.jetbrains.kotlin.psi.KtValueArgumentName
+import org.jetbrains.kotlin.psi.psiUtil.getCallNameExpression
 import org.jetbrains.kotlin.psi.psiUtil.getChildOfType
-import org.jetbrains.kotlin.psi.psiUtil.getParentOfType
 import ru.ztrap.plugin.idea.compose.color.preview.line.marker.provider.ColorAwareLineMarkerInfo
+import ru.ztrap.plugin.idea.compose.color.preview.utils.KEY_COMPOSE_COLOR_FQ
 import ru.ztrap.plugin.idea.compose.color.preview.utils.createColorFunction
+import ru.ztrap.plugin.idea.compose.color.preview.utils.firstSiblingOfTypeOrNull
+import ru.ztrap.plugin.idea.compose.color.preview.utils.getInitializerOrGetterInitializer
 import ru.ztrap.plugin.idea.compose.color.preview.utils.isComposeColorFun
+import ru.ztrap.plugin.idea.compose.color.preview.utils.safeCast
 import ru.ztrap.plugin.idea.compose.color.preview.utils.toAwtColor
-
-private val ALLOWED_COLOR_SOURCE_PARENTS = arrayOf(
-    KtBlockExpression::class,
-    KtPropertyAccessor::class,
-    KtBinaryExpression::class,
-    KtReturnExpression::class,
-    KtDotQualifiedExpression::class,
-    KtValueArgument::class,
-)
 
 internal data object EditableColorLineMarkerProviderDelegate : LineMarkerProviderDelegate() {
 
     override val option = createOption("Color chooser")
 
     override fun getLineMarkerInfo(leaf: LeafPsiElement): ColorAwareLineMarkerInfo? {
-        return findColorSource(leaf)
+        val expression = findColorSource(leaf)
+        return expression
             ?.createColorFunction()
             ?.getColor()
             ?.toAwtColor()
             ?.let { color ->
+                leaf.putUserData(KEY_COMPOSE_COLOR_FQ, expression)
                 EditableColorLineMarkerInfo(
                     color = color,
                     message = IdeBundle.message("dialog.title.choose.color"),
@@ -55,29 +53,54 @@ internal data object EditableColorLineMarkerProviderDelegate : LineMarkerProvide
             }
     }
 
-    private fun setColorTo(element: LeafPsiElement, awtColor: java.awt.Color) {
-        val colorFunction = findColorSource(element)?.createColorFunction() ?: return
+    private fun setColorTo(leaf: LeafPsiElement, awtColor: java.awt.Color) {
+        val expression = leaf.getUserData(KEY_COMPOSE_COLOR_FQ) ?: findColorSource(leaf)
+        val colorFunction = expression?.createColorFunction() ?: return
         val currentComposeColor = colorFunction.getColor() ?: return
         val newComposeColor = Color(awtColor.red, awtColor.green, awtColor.blue, awtColor.alpha)
             .convert(currentComposeColor.colorSpace)
 
         if (currentComposeColor == newComposeColor) return
 
-        val factory = KtPsiFactory(element.project, true)
+        val factory = KtPsiFactory(leaf.project, true)
         colorFunction.setNewColor(newComposeColor, factory)
     }
 
-    private fun findColorSource(element: PsiElement): KtCallExpression? {
-        val callExpression = when (val parent = element.parent) {
-            is KtParameter -> parent.getChildOfType<KtCallExpression>()
-            is KtProperty -> parent.getChildOfType<KtCallExpression>()
-            is KtNameReferenceExpression -> parent.getParentOfType<KtCallExpression>(strict = true)
-                ?.takeIf { it.parent::class in ALLOWED_COLOR_SOURCE_PARENTS }
-
+    private fun findColorSource(leaf: LeafPsiElement): KtCallExpression? {
+        val callExpression = when (val parent1 = leaf.parent) {
+            is KtParameter -> parent1.getChildOfType<KtCallExpression>()
+            is KtProperty -> parent1.getInitializerOrGetterInitializer()?.safeCast<KtCallExpression>()
+            is KtNameReferenceExpression -> findCallByReferenceExpression(leaf, parent1)
             else -> null
         }
 
         return callExpression?.takeIf(KtCallExpression::isComposeColorFun)
+    }
+
+    private fun findCallByReferenceExpression(
+        leaf: LeafPsiElement,
+        reference: KtNameReferenceExpression,
+    ): KtCallExpression? {
+        return when (val refParent = reference.parent) {
+            is KtValueArgumentName -> refParent.firstSiblingOfTypeOrNull<KtCallExpression>()
+            is KtCallExpression -> when (val callParent = refParent.parent) {
+                is KtParameter,
+                is KtProperty,
+                is KtPropertyAccessor,
+                -> null // skip it, we've already attached icons to prop/param identifier
+
+                is KtBlockExpression,
+                is KtBinaryExpression,
+                is KtReturnExpression,
+                is KtDotQualifiedExpression,
+                -> refParent.takeIf { refParent.getCallNameExpression()?.getIdentifier() == leaf }
+
+                is KtValueArgument -> refParent.takeUnless { callParent.isNamed() }
+                else -> refParent
+            }
+
+            else -> null
+        }
     }
 
     private class EditableColorLineMarkerInfo(

@@ -5,10 +5,9 @@ import com.intellij.psi.SmartPsiElementPointer
 import com.intellij.psi.impl.source.tree.LeafPsiElement
 import java.awt.Color
 import org.jetbrains.kotlin.psi.KtCallExpression
-import org.jetbrains.kotlin.psi.KtNameReferenceExpression
 import org.jetbrains.kotlin.psi.psiUtil.createSmartPointer
-import org.jetbrains.kotlin.psi.psiUtil.getChildOfType
-import org.jetbrains.kotlin.psi.psiUtil.getParentOfType
+import org.jetbrains.kotlin.psi.psiUtil.getCallNameExpression
+import org.jetbrains.kotlin.psi.psiUtil.getStrictParentOfType
 import ru.ztrap.plugin.idea.compose.color.preview.line.marker.provider.ColorAwareLineMarkerInfo
 import ru.ztrap.plugin.idea.compose.color.preview.line.marker.provider.GoToSmartPointerNavigationHandler
 import ru.ztrap.plugin.idea.compose.color.preview.utils.createColorFunction
@@ -33,9 +32,9 @@ internal data object ColorModifiersLineMarkerProviderDelegate : LineMarkerProvid
             }
     }
 
-    private fun findModifierExpression(element: LeafPsiElement): KtCallExpression? {
-        return element.getParentOfType<KtCallExpression>(true)
-            ?.takeIf { it.getChildOfType<KtNameReferenceExpression>()?.getIdentifier() == element }
+    private fun findModifierExpression(leaf: LeafPsiElement): KtCallExpression? {
+        return leaf.getStrictParentOfType<KtCallExpression>()
+            ?.takeIf { it.getCallNameExpression()?.getIdentifier() == leaf }
             ?.takeIf(KtCallExpression::isComposeColorModifierFun)
     }
 

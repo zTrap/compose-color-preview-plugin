@@ -5,11 +5,9 @@ import androidx.compose.ui.graphics.colorspace.ColorSpaces
 import com.intellij.psi.PsiElement
 import com.intellij.psi.impl.source.tree.LeafPsiElement
 import kotlin.math.absoluteValue
-import org.jetbrains.kotlin.idea.intentions.callExpression
 import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
 import org.jetbrains.kotlin.psi.KtNameReferenceExpression
-import org.jetbrains.kotlin.psi.psiUtil.getParentOfType
 
 internal fun PsiElement.getColor(): Color = getColorOrNull().requireNotNull()
 
@@ -17,12 +15,14 @@ internal fun PsiElement.getColorOrNull(): Color? {
     val expression = when (this) {
         is LeafPsiElement -> findColorConstantExpression(this)
         is KtCallExpression -> this
-        is KtNameReferenceExpression -> getParentOfType<KtCallExpression>(true)
+        is KtNameReferenceExpression -> parent.safeCast<KtCallExpression>()
             ?: resolveNameReference(this)
 
-        is KtDotQualifiedExpression -> callExpression ?: lastChild
-            ?.safeCast<KtNameReferenceExpression>()
-            ?.let(::resolveNameReference)
+        is KtDotQualifiedExpression -> when (val selector = selectorExpression) {
+            is KtNameReferenceExpression -> resolveNameReference(selector)
+            is KtCallExpression -> selector
+            else -> null
+        }
 
         else -> null
     }

@@ -32,8 +32,8 @@ It works with `androidx.compose.ui.graphics.Color` from
 
 Install it from the Jetbrains plugin repository within your IDE (**recommended**):
 
-- <kbd>Settings/Preferences</kbd> > <kbd>Plugins</kbd> > <kbd>Marketplace</kbd> > <kbd>Search 'Compose color
-  preview'</kbd>
+- <kbd>Settings/Preferences</kbd> > <kbd>Plugins</kbd> > <kbd>Marketplace</kbd> > <kbd>Search 'Compose Color
+  Preview'</kbd>
 
 You can also download the JAR package from
 the [Jetbrains plugin repository](https://plugins.jetbrains.com/plugin/21298-compose-color-preview) or
@@ -49,7 +49,7 @@ plugins:
   <br/>
   You can simply disable one of the previews. 
   Go to <kbd>Settings/Preferences</kbd> > <kbd>Editor</kbd> > <kbd>General</kbd> > <kbd>Gutter Icons</kbd> and disable 
-  "Compose color picker" from "Jetpack compose" section or "Color preview" from "Compose color preview" section
+  "Compose color picker" from "Jetpack compose" section or "Color chooser" from "Compose Color Preview" section
 </details>
 <br/>
 <details>
