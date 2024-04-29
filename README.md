@@ -1,8 +1,8 @@
 [![Plugin version](https://img.shields.io/jetbrains/plugin/v/21298-compose-color-preview)](https://plugins.jetbrains.com/plugin/21298-compose-color-preview)
 
-# ![Preview](./src/main/resources/META-INF/pluginIcon.svg) Compose color preview plugin for JetBrains IDE family
+# ![Preview](plugin/src/main/resources/META-INF/pluginIcon.svg) Compose color preview plugin for JetBrains IDE family
 
-This plugin draws colors on editor's gutter. You can modify colors by clicking on the icons
+This plugin draws colors on editor's gutter and code completion popup. You can modify them by clicking on the icons in the gutter
 
 It works with `androidx.compose.ui.graphics.Color` from
 [Jetpack Compose](https://developer.android.com/develop/ui/compose) or
@@ -10,6 +10,9 @@ It works with `androidx.compose.ui.graphics.Color` from
 
 ## Features
 
+- [x] Show preview in code completion popup for simple constant fields
+- [x] Show preview in places simple constant fields usage with type `Color`
+- [x] Show preview for results of `compositeOver`, `copy`, `convert` and `lerp` functions
 - [x] Show preview in `Color` creation places
     - [x] ULong constructor
     - [x] Long function "constructor"
@@ -23,10 +26,9 @@ It works with `androidx.compose.ui.graphics.Color` from
     - [x] hsv "constructor"
 - [x] Show palette by clicking on preview to change color
     - [x] Change color with saving original numeral system
-- [x] Show preview in places fields usage with type `Color`
-- [x] Show preview for results of `compositeOver`, `copy`, `convert` and `lerp` functions
 
-![Preview](./.github/preview.png)
+![Preview1](./.github/preview1.png)
+![Preview2](./.github/preview2.png)
 
 ## Installation
 
