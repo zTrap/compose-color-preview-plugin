@@ -1,5 +1,16 @@
 # Change Log
 
+## [0.0.8] - 29-04-2024
+
+### Added
+
+- Preview for simple constant fields is now renders also in code completion popup
+
+### Fixed
+
+- Unspecified color is now excluded from rendering
+- Switched to using the kotlin IDE's built-in stdlib instead of the explicit one
+
 ## [0.0.7] - 23-04-2024
 
 ### Fixed

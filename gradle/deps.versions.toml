@@ -1,0 +1,18 @@
+[versions]
+# https://plugins.jetbrains.com/docs/intellij/using-kotlin.html#kotlin-standard-library
+kotlin-forPlugin = "1.7.0"
+kotlin-forSample = "1.9.23"
+intellij = "1.17.3"
+compose = "1.6.2"
+
+plugin = "0.0.8"
+idea-name = "2022.3"
+idea-code-min = "223"
+idea-code-max = "223"
+jvm = "17"
+
+[plugins]
+kotlin-forPlugin = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin-forPlugin" }
+kotlin-forSample = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin-forSample" }
+intellij = { id = "org.jetbrains.intellij", version.ref = "intellij" }
+compose = { id = "org.jetbrains.compose", version.ref = "compose" }
