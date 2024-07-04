@@ -7,12 +7,11 @@
     <change-notes><![CDATA[
         <h3>New Features</h3>
         <ul>
-            <li>Preview for simple constant fields is now renders also in code completion popup</li>
+            <li>Added chessboard drawing behind icons for highlighting transparent colors</li>
         </ul>
         <h3>Bug Fixes</h3>
         <ul>
-            <li>Unspecified color is now excluded from rendering</li>
-            <li>Switched to using the kotlin IDE's built-in stdlib instead of the explicit one</li>
+            <li>Missed leading zeros when alpha is lower than 6% now renders properly</li>
         </ul>
 
         <br><br>
@@ -21,7 +20,7 @@
 
     <description><![CDATA[
         <h1>Compose color preview.</h1>
-        <p>This plugin draws colors on editor's gutter and code completion popup. You can modify them by clicking on the icons in the gutter</p>
+        <p>This plugin draws colors in the editor gutter and the code completion popup. You can modify them by clicking on the icons in the gutter</p>
 
         <p>It works with <code>androidx.compose.ui.graphics.Color</code> from
         <a href="https://developer.android.com/develop/ui/compose">Jetpack Compose</a> or
@@ -30,28 +29,28 @@
         <h3>Features</h3>
 
         <ul>
-            <li>Show preview in code completion popup for simple constant fields</li>
-            <li>Show preview in places simple constant fields usage with type <code>Color</code></li>
-            <li>Show preview for results of <code>compositeOver</code>, <code>copy</code>, <code>convert</code> and <code>lerp</code> functions</li>
+            <li>Shows preview in the code completion popup for simple constant fields</li>
+            <li>Shows preview in places simple constant fields usage with type <code>Color</code></li>
+            <li>Shows preview for results of <code>compositeOver</code>, <code>copy</code>, <code>convert</code> and <code>lerp</code> functions</li>
             <li>
                 Show preview in <code>Color</code> creation places
                 <ul>
                     <li>ULong constructor</li>
-                    <li>Long function "constructor"</li>
-                    <li>Int function "constructor"</li>
-                    <li>Int x3 function "constructor"</li>
-                    <li>Float x3 function "constructor"</li>
-                    <li>Float x3 with color scheme function "constructor"</li>
-                    <li>Float x4 function "constructor"</li>
-                    <li>Float x4 with color scheme function "constructor"</li>
-                    <li>hsl "constructor"</li>
-                    <li>hsv "constructor"</li>
+                    <li>Long "constructor" function</li>
+                    <li>Int "constructor" function"</li>
+                    <li>Int x3 "constructor" function</li>
+                    <li>Float x3 "constructor" function</li>
+                    <li>Float x3 with color scheme "constructor" function</li>
+                    <li>Float x4 "constructor" function</li>
+                    <li>Float x4 with color scheme "constructor" function</li>
+                    <li>hsl "constructor" function</li>
+                    <li>hsv "constructor" function</li>
                 </ul>
             </li>
             <li>
-                Show palette by clicking on preview in gutter to change color
+                Shows palette by clicking on the icon to change color
                 <ul>
-                    <li>Change color with saving original numeral system</li>
+                    <li>Change color with saving the original numeral system</li>
                 </ul>
             </li>
         </ul>

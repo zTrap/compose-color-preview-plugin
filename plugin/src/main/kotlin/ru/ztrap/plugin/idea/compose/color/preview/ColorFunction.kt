@@ -31,7 +31,6 @@ import ru.ztrap.plugin.idea.compose.color.preview.utils.getFloat
 import ru.ztrap.plugin.idea.compose.color.preview.utils.getInt
 import ru.ztrap.plugin.idea.compose.color.preview.utils.getLong
 import ru.ztrap.plugin.idea.compose.color.preview.utils.getParentReceiverColor
-import ru.ztrap.plugin.idea.compose.color.preview.utils.getSpace
 import ru.ztrap.plugin.idea.compose.color.preview.utils.getSpaceOrNull
 import ru.ztrap.plugin.idea.compose.color.preview.utils.getULong
 import ru.ztrap.plugin.idea.compose.color.preview.utils.isMaxComponent
@@ -440,9 +439,13 @@ internal sealed class ColorFunction(protected val callExpression: KtCallExpressi
     class Convert(callExpression: KtCallExpression) : ColorFunction(callExpression) {
         override fun setNewColor(color: Color, factory: KtPsiFactory) = Unit
         override fun getColorInternal(): Color? {
-            val colorSpace = arguments.single().getSpace()
+            val colorSpace = arguments.single().getSpaceOrNull()
             val receiverColor = callExpression.getParentReceiverColor()
-            return receiverColor?.convert(colorSpace)
+            return if (receiverColor != null && colorSpace != null) {
+                receiverColor.convert(colorSpace)
+            } else {
+                null
+            }
         }
     }
 
@@ -451,8 +454,8 @@ internal sealed class ColorFunction(protected val callExpression: KtCallExpressi
         override fun getColorInternal(): Color? {
             val argumentColor = arguments.single().getArgumentExpression()?.getColor()
             val receiverColor = callExpression.getParentReceiverColor()
-            return if (argumentColor != null) {
-                receiverColor?.compositeOver(argumentColor)
+            return if (receiverColor != null && argumentColor != null) {
+                receiverColor.compositeOver(argumentColor)
             } else {
                 null
             }

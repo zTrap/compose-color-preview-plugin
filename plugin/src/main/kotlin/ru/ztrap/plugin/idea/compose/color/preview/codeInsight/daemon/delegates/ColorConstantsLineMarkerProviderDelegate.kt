@@ -4,9 +4,9 @@ import com.intellij.codeInsight.daemon.NavigateAction
 import com.intellij.icons.AllIcons
 import com.intellij.psi.PsiElement
 import com.intellij.psi.SmartPsiElementPointer
+import com.intellij.psi.createSmartPointer
 import com.intellij.psi.impl.source.tree.LeafPsiElement
 import java.awt.Color
-import org.jetbrains.kotlin.psi.psiUtil.createSmartPointer
 import ru.ztrap.plugin.idea.compose.color.preview.codeInsight.daemon.ColorAwareLineMarkerInfo
 import ru.ztrap.plugin.idea.compose.color.preview.codeInsight.daemon.GoToSmartPointerNavigationHandler
 import ru.ztrap.plugin.idea.compose.color.preview.utils.createColorFunction

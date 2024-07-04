@@ -175,8 +175,6 @@ internal fun List<KtValueArgument>.findColorSpaceArg(): KtValueArgument? {
     }
 }
 
-internal fun KtValueArgument?.getSpace(): ColorSpace = getSpaceOrNull().requireNotNull()
-
 internal fun KtValueArgument?.getSpaceOrNull(): ColorSpace? {
     val constantName = this?.lastLeaf()?.text
 

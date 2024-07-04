@@ -81,7 +81,7 @@ internal fun KtPsiFactory.createNewLongExpression(argument: KtValueArgument, val
     val result = ((ulongValue shr 32) shl 32) or value.toUInt().toULong()
 
     return if (hex) {
-        createExpression("$HEX_FORMAT_PREFIX${result.toString(HEX_FORMAT_RADIX)}")
+        createExpression(HEX_FORMAT.format(result.toLong()))
     } else {
         createExpression(result.toLong().toString())
     }
@@ -94,13 +94,10 @@ internal fun KtPsiFactory.createNewIntExpression(argument: KtValueArgument, valu
 internal fun KtPsiFactory.createNewIntExpression(argument: KtValueArgument, value: Int): KtExpression {
     val argumentText = argument.lastChild.text
 
-    val text = buildString {
-        if (argumentText.startsWith(HEX_FORMAT_PREFIX, true)) {
-            append(HEX_FORMAT_PREFIX)
-            append(value.toUInt().toString(HEX_FORMAT_RADIX))
-        } else {
-            append(value)
-        }
+    val text = if (argumentText.startsWith(HEX_FORMAT_PREFIX, true)) {
+        HEX_FORMAT.format(value)
+    } else {
+        value.toString()
     }
 
     return createExpression(text)
