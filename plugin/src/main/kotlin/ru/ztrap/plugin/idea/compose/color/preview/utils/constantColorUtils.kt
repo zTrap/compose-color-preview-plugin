@@ -1,5 +1,6 @@
 package ru.ztrap.plugin.idea.compose.color.preview.utils
 
+import com.intellij.psi.PsiElement
 import com.intellij.psi.impl.source.tree.LeafPsiElement
 import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
@@ -23,11 +24,14 @@ internal fun resolveNameReference(reference: KtNameReferenceExpression): KtCallE
 internal fun resolveKtProperty(element: KtProperty): KtCallExpression? {
     if (element.isVar) return null
     val expression = element.getInitializerOrGetterInitializer() ?: return null
+    return resolveConstantOrCtor(expression)
+}
 
-    return when (expression) {
-        is KtCallExpression -> expression
-        is KtNameReferenceExpression -> resolveNameReference(expression)
-        is KtDotQualifiedExpression -> when (val selector = expression.selectorExpression) {
+private fun resolveConstantOrCtor(element: PsiElement): KtCallExpression? {
+    return when (element) {
+        is KtCallExpression -> element
+        is KtNameReferenceExpression -> resolveNameReference(element)
+        is KtDotQualifiedExpression -> when (val selector = element.selectorExpression) {
             is KtNameReferenceExpression -> resolveNameReference(selector)
             is KtCallExpression -> selector
             else -> null

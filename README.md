@@ -2,30 +2,30 @@
 
 # ![Preview](plugin/src/main/resources/META-INF/pluginIcon.svg) Compose color preview plugin for JetBrains IDE family
 
-This plugin draws colors on editor's gutter and code completion popup. You can modify them by clicking on the icons in the gutter
+This plugin draws colors in the editor gutter and the code completion popup. You can modify them by clicking on the icons in the gutter
 
-It works with `androidx.compose.ui.graphics.Color` from
+It works with the `androidx.compose.ui.graphics.Color` from
 [Jetpack Compose](https://developer.android.com/develop/ui/compose) or
 [Compose Multiplatform](https://www.jetbrains.com/lp/compose-multiplatform)
 
 ## Features
 
-- [x] Show preview in code completion popup for simple constant fields
-- [x] Show preview in places simple constant fields usage with type `Color`
-- [x] Show preview for results of `compositeOver`, `copy`, `convert` and `lerp` functions
-- [x] Show preview in `Color` creation places
+- [x] Shows preview in the code completion popup for simple constant fields
+- [x] Shows preview in places simple constant fields usage with type `Color`
+- [x] Shows preview for results of `compositeOver`, `copy`, `convert` and `lerp` functions
+- [x] Shows preview in the `Color` creation places
     - [x] ULong constructor
-    - [x] Long function "constructor"
-    - [x] Int function "constructor"
-    - [x] Int x3 function "constructor"
-    - [x] Float x3 function "constructor"
-    - [x] Float x3 with color scheme function "constructor"
-    - [x] Float x4 function "constructor"
-    - [x] Float x4 with color scheme function "constructor"
-    - [x] hsl "constructor"
-    - [x] hsv "constructor"
-- [x] Show palette by clicking on preview to change color
-    - [x] Change color with saving original numeral system
+    - [x] Long "constructor" function
+    - [x] Int "constructor" function
+    - [x] Int x3 "constructor" function
+    - [x] Float x3 "constructor" function
+    - [x] Float x3 with color scheme "constructor" function
+    - [x] Float x4 "constructor" function
+    - [x] Float x4 with color scheme "constructor" function
+    - [x] hsl "constructor" function
+    - [x] hsv "constructor" function
+- [x] Shows palette by clicking on the icon to change color
+    - [x] Change color with saving the original numeral system
 
 ![Preview1](./.github/preview1.png)
 ![Preview2](./.github/preview2.png)

@@ -1,5 +1,15 @@
 # Change Log
 
+## [0.0.9] - 04-07-2024
+
+### Added
+
+- Added chessboard drawing behind icons for highlighting transparent colors
+
+### Fixed
+
+- Missed leading zeros when alpha is lower than 6% now renders properly
+
 ## [0.0.8] - 29-04-2024
 
 ### Added

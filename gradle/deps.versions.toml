@@ -1,11 +1,11 @@
 [versions]
 # https://plugins.jetbrains.com/docs/intellij/using-kotlin.html#kotlin-standard-library
 kotlin-forPlugin = "1.9.22"
-kotlin-forSample = "1.9.23"
-intellij = "1.17.3"
-compose = "1.6.2"
+kotlin-forSample = "1.9.24"
+intellij = "1.17.4" # https://plugins.gradle.org/plugin/org.jetbrains.intellij
+compose = "1.6.11" # https://plugins.gradle.org/plugin/org.jetbrains.compose
 
-plugin = "0.0.8"
+plugin = "0.0.9"
 idea-name = "2024.1"
 idea-code-min = "241"
 idea-code-max = "241"
