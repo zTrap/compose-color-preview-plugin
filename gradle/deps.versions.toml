@@ -1,13 +1,13 @@
 [versions]
 # https://plugins.jetbrains.com/docs/intellij/using-kotlin.html#kotlin-standard-library
 kotlin-forPlugin = "1.9.24"
-kotlin-forSample = "1.9.24"
-intellij = "2.0.0" # https://plugins.gradle.org/plugin/org.jetbrains.intellij.platform
-compose = "1.6.11" # https://plugins.gradle.org/plugin/org.jetbrains.compose
+kotlin-forSample = "2.0.21"
+intellij = "2.1.0" # https://plugins.gradle.org/plugin/org.jetbrains.intellij.platform
+compose = "1.7.1" # https://plugins.gradle.org/plugin/org.jetbrains.compose
 
-plugin = "0.0.9"
-idea-name = "2024.2"
-idea-code-min = "242"
+plugin = "0.0.10"
+idea-name = "2024.2.1"
+idea-code-min = "242.1"
 idea-code-max = "242"
 jvm = "21"
 
@@ -16,3 +16,4 @@ kotlin-forPlugin = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin-forP
 kotlin-forSample = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin-forSample" }
 intellij = { id = "org.jetbrains.intellij.platform", version.ref = "intellij" }
 compose = { id = "org.jetbrains.compose", version.ref = "compose" }
+compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin-forSample" }

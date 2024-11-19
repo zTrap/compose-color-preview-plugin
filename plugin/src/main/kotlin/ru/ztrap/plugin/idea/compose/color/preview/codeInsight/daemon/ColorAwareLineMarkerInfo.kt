@@ -27,6 +27,10 @@ internal abstract class ColorAwareLineMarkerInfo(
 ) {
     override fun canMergeWith(info: MergeableLineMarkerInfo<*>): Boolean = this::class.isInstance(info)
 
+    override fun getElementPresentation(element: PsiElement): String {
+        return element.text.replace("_", "__") // remove mnemonic
+    }
+
     override fun getCommonIcon(infos: MutableList<out MergeableLineMarkerInfo<*>>): Icon {
         val colors = Array(infos.size) { infos[it].cast<ColorAwareLineMarkerInfo>().color }
         return JBUIScale.scaleIcon(ComposeColorIcon(12, colors = colors))

@@ -19,7 +19,7 @@ class ComposeColorPreviewLineMarkerProvider : LineMarkerProviderDescriptor() {
         ColorModifiersLineMarkerProviderDelegate,
     )
 
-    private val options = Array(delegates.size) { delegates[it].option }
+    private val options = Array(delegates.size) { index -> delegates[index].option }
 
     override fun getOptions(): Array<Option> = options
     override fun getName(): String = ""

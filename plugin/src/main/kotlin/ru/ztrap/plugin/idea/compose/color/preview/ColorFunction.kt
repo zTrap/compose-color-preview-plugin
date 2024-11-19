@@ -3,6 +3,7 @@ package ru.ztrap.plugin.idea.compose.color.preview
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.colorspace.Rgb
 import androidx.compose.ui.graphics.compositeOver
+import androidx.compose.ui.graphics.getComponents
 import androidx.compose.ui.graphics.isSpecified
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.graphics.toArgb
@@ -26,7 +27,6 @@ import ru.ztrap.plugin.idea.compose.color.preview.utils.createNewULongExpression
 import ru.ztrap.plugin.idea.compose.color.preview.utils.find
 import ru.ztrap.plugin.idea.compose.color.preview.utils.findColorSpaceArg
 import ru.ztrap.plugin.idea.compose.color.preview.utils.getColor
-import ru.ztrap.plugin.idea.compose.color.preview.utils.getComponents
 import ru.ztrap.plugin.idea.compose.color.preview.utils.getFloat
 import ru.ztrap.plugin.idea.compose.color.preview.utils.getInt
 import ru.ztrap.plugin.idea.compose.color.preview.utils.getLong
