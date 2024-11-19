@@ -24,9 +24,9 @@ package androidx.compose.ui.graphics.colorspace
  *
  * @see ColorSpace.connect
  */
-/*@Immutable*/
+//@Immutable
 @kotlin.jvm.JvmInline
-value class RenderIntent internal constructor(@Suppress("unused") private val value: Int) {
+value class RenderIntent internal constructor(@Suppress("unused") internal val value: Int) {
     companion object {
         /**
          * Compresses the source gamut into the destination gamut.

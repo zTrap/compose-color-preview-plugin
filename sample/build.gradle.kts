@@ -1,6 +1,7 @@
 plugins {
-    alias(deps.plugins.compose)
     alias(deps.plugins.kotlin.forSample)
+    alias(deps.plugins.compose.compiler)
+    alias(deps.plugins.compose)
 }
 
 kotlin {
