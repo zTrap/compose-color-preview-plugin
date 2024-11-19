@@ -1,18 +1,24 @@
 [versions]
 # https://plugins.jetbrains.com/docs/intellij/using-kotlin.html#kotlin-standard-library
-kotlin-forPlugin = "1.9.24"
-kotlin-forSample = "1.9.24"
-intellij = "2.0.0" # https://plugins.gradle.org/plugin/org.jetbrains.intellij.platform
-compose = "1.6.11" # https://plugins.gradle.org/plugin/org.jetbrains.compose
+kotlin-forPlugin = "2.2.20"
+kotlin-forSample = "2.2.20"
+intellij = "2.10.5" # https://plugins.gradle.org/plugin/org.jetbrains.intellij.platform
+compose = "1.9.3" # https://plugins.gradle.org/plugin/org.jetbrains.compose
+androidx-annotation = "1.9.1" # https://plugins.gradle.org/plugin/org.jetbrains.compose
 
-plugin = "0.0.9"
-idea-name = "2024.2"
-idea-code-min = "242"
-idea-code-max = "242"
+plugin = "0.0.10"
+idea-name = "2025.3" # https://mvnrepository.com/artifact/com.jetbrains.intellij.idea/ideaIC
+idea-code-min = "253"
+idea-code-max = "253"
 jvm = "21"
+
+[libraries]
+androidx-annotation = { module = "androidx.annotation:annotation", version.ref = "androidx-annotation" }
+compose-annotation = { module = "androidx.compose.runtime:runtime-annotation", version.ref = "compose" }
 
 [plugins]
 kotlin-forPlugin = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin-forPlugin" }
 kotlin-forSample = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin-forSample" }
 intellij = { id = "org.jetbrains.intellij.platform", version.ref = "intellij" }
 compose = { id = "org.jetbrains.compose", version.ref = "compose" }
+compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin-forSample" }
