@@ -1,5 +1,11 @@
 # Change Log
 
+## [0.0.10] - 19-11-2024
+
+### Added
+
+- Added compatibility with K2 mode
+
 ## [0.0.9] - 04-07-2024
 
 ### Added

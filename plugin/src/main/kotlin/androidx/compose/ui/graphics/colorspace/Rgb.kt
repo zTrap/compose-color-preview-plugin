@@ -295,12 +295,7 @@ internal constructor(
             this.transform = computeXYZMatrix(this.primaries, this.whitePoint)
         } else {
             if (transform.size != 9) {
-                throw IllegalArgumentException(
-                    (
-                            "Transform must have 9 entries! Has " +
-                                    "${transform.size}"
-                            )
-                )
+                throw IllegalArgumentException("Transform must have 9 entries! Has ${transform.size}")
             }
             this.transform = transform
         }
@@ -691,7 +686,7 @@ internal constructor(
         gamma: Double,
         min: Float,
         max: Float,
-        id: Int,
+        id: Int
     ) : this(
         name, primaries, whitePoint, null,
         if (gamma == 1.0) DoubleIdentity
@@ -712,7 +707,7 @@ internal constructor(
     internal constructor(
         colorSpace: Rgb,
         transform: FloatArray,
-        whitePoint: WhitePoint,
+        whitePoint: WhitePoint
     ) : this(
         colorSpace.name, colorSpace.primaries, whitePoint, transform,
         colorSpace.oetfOrig, colorSpace.eotfOrig, colorSpace.min, colorSpace.max,
@@ -918,7 +913,7 @@ internal constructor(
         y: Float,
         z: Float,
         a: Float,
-        colorSpace: ColorSpace,
+        colorSpace: ColorSpace
     ): Color {
         var v0 = mul3x3Float3_0(inverseTransform, x, y, z)
         var v1 = mul3x3Float3_1(inverseTransform, x, y, z)
@@ -963,12 +958,9 @@ internal constructor(
         var result = super.hashCode()
         result = 31 * result + whitePoint.hashCode()
         result = 31 * result + primaries.contentHashCode()
-        result = 31 * result + (if (min != +0.0f) min.toBits() else 0)
-        result = 31 * result + (if (max != +0.0f) max.toBits() else 0)
-        result = (
-                31 * result +
-                        if (transferParameters != null) transferParameters.hashCode() else 0
-                )
+        result = 31 * result + (if (min != 0.0f) min.toBits() else 0)
+        result = 31 * result + (if (max != 0.0f) max.toBits() else 0)
+        result = (31 * result + (transferParameters?.hashCode() ?: 0))
         if (transferParameters == null) {
             result = 31 * result + oetfOrig.hashCode()
             result = 31 * result + eotfOrig.hashCode()
@@ -1003,7 +995,7 @@ internal constructor(
             EOTF: DoubleFunction,
             min: Float,
             max: Float,
-            id: Int,
+            id: Int
         ): Boolean {
             if (id == 0) return true
             if (!compare(primaries, ColorSpaces.SrgbPrimaries)) {
@@ -1043,7 +1035,7 @@ internal constructor(
         private fun compare(
             point: Double,
             a: DoubleFunction,
-            b: DoubleFunction,
+            b: DoubleFunction
         ): Boolean {
             val rA = a(point)
             val rB = b(point)
@@ -1068,7 +1060,7 @@ internal constructor(
         private fun isWideGamut(
             primaries: FloatArray,
             min: Float,
-            max: Float,
+            max: Float
         ): Boolean {
             return (
                     (
@@ -1333,7 +1325,7 @@ internal constructor(
          */
         private fun computeXYZMatrix(
             primaries: FloatArray,
-            whitePoint: WhitePoint,
+            whitePoint: WhitePoint
         ): FloatArray {
             val rx = primaries[0]
             val ry = primaries[1]

@@ -1,8 +1,12 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
-    java
-    alias(deps.plugins.intellij)
     alias(deps.plugins.kotlin.forPlugin)
+    alias(deps.plugins.intellij)
+    java
 }
+
+val eap = false
 
 repositories {
     mavenCentral()
@@ -10,20 +14,33 @@ repositories {
     gradlePluginPortal()
 
     intellijPlatform.defaultRepositories()
+
+    if (eap) {
+        intellijPlatform.nightly()
+    }
 }
 
+val suffix = "-EAP".takeIf { eap }.orEmpty()
+
 group = "ru.ztrap.plugin.idea"
-version = "${deps.versions.plugin.get()}-${deps.versions.idea.code.min.get()}"
+version = "${deps.versions.plugin.get()}-${deps.versions.idea.code.min.get()}$suffix"
 
 dependencies {
     intellijPlatform {
-        intellijIdeaCommunity(deps.versions.idea.name)
+        if (eap) {
+            val versionName = buildString {
+                append(deps.versions.idea.code.min.get())
+                append("-EAP-SNAPSHOT")
+            }
+            intellijIdeaCommunity(versionName, false)
+        } else {
+            intellijIdeaCommunity(deps.versions.idea.name)
+        }
         bundledPlugin("com.intellij.java")
         bundledPlugin("org.jetbrains.kotlin")
 
         pluginVerifier()
         zipSigner()
-        instrumentationTools()
     }
 }
 
@@ -50,6 +67,9 @@ intellijPlatform {
 
     publishing {
         token = stringProp("publishing.plugin.token")
+        if (eap) {
+            channels = listOf("eap")
+        }
     }
 }
 
@@ -62,7 +82,15 @@ tasks {
     }
 
     compileKotlin {
-        kotlinOptions.jvmTarget = jvmVersion
+        compilerOptions.jvmTarget = JvmTarget.fromTarget(jvmVersion)
+    }
+}
+
+val runIdeK2 by intellijPlatformTesting.runIde.registering {
+    task {
+        jvmArgumentProviders += CommandLineArgumentProvider {
+            listOf("-Didea.kotlin.plugin.use.k2=true")
+        }
     }
 }
 
