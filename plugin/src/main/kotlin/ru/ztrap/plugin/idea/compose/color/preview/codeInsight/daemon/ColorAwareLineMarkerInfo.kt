@@ -21,6 +21,7 @@ internal abstract class ColorAwareLineMarkerInfo(
     /* textRange = */ anchor.textRange,
     /* icon = */ JBUIScale.scaleIcon(ComposeColorIcon(12, color)),
     /* tooltipProvider = */ { tooltipText },
+    /* presentationProvider = */ { it.text.replace("_", "__") }, // remove mnemonic
     /* navHandler = */ navHandler,
     /* alignment = */ GutterIconRenderer.Alignment.LEFT,
     /* accessibleNameProvider = */ { tooltipText },

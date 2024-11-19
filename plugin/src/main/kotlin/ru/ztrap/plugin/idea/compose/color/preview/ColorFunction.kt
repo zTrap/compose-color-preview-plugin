@@ -3,15 +3,19 @@ package ru.ztrap.plugin.idea.compose.color.preview
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.colorspace.Rgb
 import androidx.compose.ui.graphics.compositeOver
+import androidx.compose.ui.graphics.getComponents
 import androidx.compose.ui.graphics.isSpecified
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.graphics.toArgb
 import com.intellij.openapi.application.runWriteAction
+import org.jetbrains.kotlin.idea.base.psi.appendValueArgument
+import org.jetbrains.kotlin.idea.base.psi.astReplace
+import org.jetbrains.kotlin.idea.base.psi.deleteValueArgument
+import org.jetbrains.kotlin.idea.base.psi.insertValueArgumentAfter
 import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtPsiFactory
 import org.jetbrains.kotlin.psi.KtValueArgument
 import org.jetbrains.kotlin.psi.KtValueArgumentList
-import org.jetbrains.kotlin.psi.psiUtil.astReplace
 import ru.ztrap.plugin.idea.compose.color.preview.utils.ARGB_NAMES
 import ru.ztrap.plugin.idea.compose.color.preview.utils.LERP_NAMES
 import ru.ztrap.plugin.idea.compose.color.preview.utils.createAlphaFloatArgument
@@ -26,7 +30,6 @@ import ru.ztrap.plugin.idea.compose.color.preview.utils.createNewULongExpression
 import ru.ztrap.plugin.idea.compose.color.preview.utils.find
 import ru.ztrap.plugin.idea.compose.color.preview.utils.findColorSpaceArg
 import ru.ztrap.plugin.idea.compose.color.preview.utils.getColor
-import ru.ztrap.plugin.idea.compose.color.preview.utils.getComponents
 import ru.ztrap.plugin.idea.compose.color.preview.utils.getFloat
 import ru.ztrap.plugin.idea.compose.color.preview.utils.getInt
 import ru.ztrap.plugin.idea.compose.color.preview.utils.getLong
@@ -34,7 +37,7 @@ import ru.ztrap.plugin.idea.compose.color.preview.utils.getParentReceiverColor
 import ru.ztrap.plugin.idea.compose.color.preview.utils.getSpaceOrNull
 import ru.ztrap.plugin.idea.compose.color.preview.utils.getULong
 import ru.ztrap.plugin.idea.compose.color.preview.utils.isMaxComponent
-import ru.ztrap.plugin.idea.compose.color.preview.utils.modifyIfNotNull
+import ru.ztrap.plugin.idea.compose.color.preview.utils.modifyIf
 import ru.ztrap.plugin.idea.compose.color.preview.utils.replace
 import ru.ztrap.plugin.idea.compose.color.preview.utils.safeCast
 import ru.ztrap.plugin.idea.compose.color.preview.utils.toHsl
@@ -88,7 +91,11 @@ internal sealed class ColorFunction(protected val callExpression: KtCallExpressi
 
         override fun setNewColor(color: Color, factory: KtPsiFactory) {
             val argument = arguments.single()
-            val newArgument = factory.createNewIntExpression(argument = argument, value = color.toArgb())
+            val newArgument = factory.createNewIntExpression(
+                argument = argument,
+                value = color.toArgb(),
+                isShortFormat = false,
+            )
             runWriteAction { argument.lastChild.astReplace(newArgument) }
         }
     }
@@ -117,7 +124,11 @@ internal sealed class ColorFunction(protected val callExpression: KtCallExpressi
                         factory.createIntArgument(value = color.alpha)
                     }
 
-                    argumentList?.addArgument(newAlphaArg)
+                    if (arguments.size == 4) {
+                        argumentList?.deleteValueArgument(3)
+                    }
+
+                    argumentList?.appendValueArgument(newAlphaArg)
                 }
             }
         }
@@ -141,7 +152,7 @@ internal sealed class ColorFunction(protected val callExpression: KtCallExpressi
                 argumentsPack.replace(expressionsPack)
 
                 if (color.alpha.isMaxComponent()) {
-                    argumentList?.removeArgument(argumentsPack.alpha)
+                    argumentList?.deleteValueArgument(argumentsPack.alpha)
                 }
             }
         }
@@ -171,7 +182,11 @@ internal sealed class ColorFunction(protected val callExpression: KtCallExpressi
                         factory.createFloatArgument(value = color.alpha)
                     }
 
-                    argumentList?.addArgumentAfter(newAlphaArg, argumentsPack.blue)
+                    if (arguments.size == 4) {
+                        argumentList?.deleteValueArgument(3)
+                    }
+
+                    argumentList?.insertValueArgumentAfter(newAlphaArg, argumentsPack.blue)
                 }
             }
         }
@@ -210,7 +225,7 @@ internal sealed class ColorFunction(protected val callExpression: KtCallExpressi
                 argumentsPack.replace(expressionsPack)
 
                 if (color.alpha.isMaxComponent()) {
-                    argumentList?.removeArgument(argumentsPack.alpha)
+                    argumentList?.deleteValueArgument(argumentsPack.alpha)
                 }
             }
         }
@@ -262,7 +277,7 @@ internal sealed class ColorFunction(protected val callExpression: KtCallExpressi
                         factory.createFloatArgument(value = color.alpha)
                     }
 
-                    argumentList?.addArgumentAfter(newAlphaArg, argumentsPack.blue)
+                    argumentList?.insertValueArgumentAfter(newAlphaArg, argumentsPack.blue)
                 }
             }
         }
@@ -301,7 +316,7 @@ internal sealed class ColorFunction(protected val callExpression: KtCallExpressi
                 argumentsPack.replace(expressionsPack)
 
                 if (color.alpha.isMaxComponent()) {
-                    argumentList?.removeArgument(argumentsPack.alpha)
+                    argumentList?.deleteValueArgument(argumentsPack.alpha)
                 }
             }
         }
@@ -353,7 +368,7 @@ internal sealed class ColorFunction(protected val callExpression: KtCallExpressi
                         factory.createFloatArgument(value = color.alpha)
                     }
 
-                    argumentList?.addArgumentAfter(newAlphaArg, argumentsPack.blue)
+                    argumentList?.insertValueArgumentAfter(newAlphaArg, argumentsPack.blue)
                 }
             }
         }
@@ -392,7 +407,7 @@ internal sealed class ColorFunction(protected val callExpression: KtCallExpressi
                 argumentsPack.replace(expressionsPack)
 
                 if (color.alpha.isMaxComponent()) {
-                    argumentList?.removeArgument(argumentsPack.alpha)
+                    argumentList?.deleteValueArgument(argumentsPack.alpha)
                 }
             }
         }
@@ -469,10 +484,10 @@ internal sealed class ColorFunction(protected val callExpression: KtCallExpressi
             val receiverColor = callExpression.getParentReceiverColor()
 
             return receiverColor
-                ?.modifyIfNotNull(alpha) { copy(alpha = it) }
-                ?.modifyIfNotNull(red) { copy(red = it) }
-                ?.modifyIfNotNull(green) { copy(green = it) }
-                ?.modifyIfNotNull(blue) { copy(blue = it) }
+                ?.modifyIf(alpha != null) { copy(alpha = alpha) }
+                ?.modifyIf(red != null) { copy(red = red) }
+                ?.modifyIf(green != null) { copy(green = green) }
+                ?.modifyIf(blue != null) { copy(blue = blue) }
         }
     }
 }

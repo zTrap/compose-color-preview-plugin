@@ -2,11 +2,10 @@ package ru.ztrap.plugin.idea.compose.color.preview.codeInsight.daemon.delegates
 
 import androidx.compose.ui.graphics.Color
 import com.intellij.codeInsight.daemon.GutterIconNavigationHandler
-import com.intellij.ide.IdeBundle
-import com.intellij.openapi.application.runWriteAction
 import com.intellij.psi.PsiElement
 import com.intellij.psi.impl.source.tree.LeafPsiElement
 import com.intellij.ui.ColorChooserService
+import com.intellij.ui.UIBundle
 import com.intellij.ui.awt.RelativePoint
 import java.awt.event.MouseEvent
 import org.jetbrains.kotlin.psi.KtBinaryExpression
@@ -24,6 +23,7 @@ import org.jetbrains.kotlin.psi.KtValueArgumentName
 import org.jetbrains.kotlin.psi.psiUtil.getCallNameExpression
 import org.jetbrains.kotlin.psi.psiUtil.getChildOfType
 import ru.ztrap.plugin.idea.compose.color.preview.codeInsight.daemon.ColorAwareLineMarkerInfo
+import ru.ztrap.plugin.idea.compose.color.preview.utils.AwtColor
 import ru.ztrap.plugin.idea.compose.color.preview.utils.KEY_COMPOSE_COLOR_FQ
 import ru.ztrap.plugin.idea.compose.color.preview.utils.createColorFunction
 import ru.ztrap.plugin.idea.compose.color.preview.utils.firstSiblingOfTypeOrNull
@@ -31,46 +31,39 @@ import ru.ztrap.plugin.idea.compose.color.preview.utils.getInitializerOrGetterIn
 import ru.ztrap.plugin.idea.compose.color.preview.utils.isComposeColorFun
 import ru.ztrap.plugin.idea.compose.color.preview.utils.safeCast
 import ru.ztrap.plugin.idea.compose.color.preview.utils.toAwtColor
+import ru.ztrap.plugin.idea.compose.color.preview.utils.toComposeColor
 
 internal data object EditableColorLineMarkerProviderDelegate : LineMarkerProviderDelegate() {
-
     override val option = createOption("Color chooser")
 
     override fun getLineMarkerInfo(leaf: LeafPsiElement): ColorAwareLineMarkerInfo? {
         val expression = findColorSource(leaf)
-        return expression
-            ?.createColorFunction()
-            ?.getColor()
-            ?.toAwtColor()
-            ?.let { color ->
-                leaf.putUserData(KEY_COMPOSE_COLOR_FQ, expression)
-                EditableColorLineMarkerInfo(
-                    color = color,
-                    message = IdeBundle.message("dialog.title.choose.color"),
-                    anchor = leaf,
-                    colorApplier = EditableColorLineMarkerProviderDelegate::setColorTo,
-                )
-            }
+        val colorFunction = expression?.createColorFunction() ?: return null
+        val composeColor = colorFunction.getColor() ?: return null
+        val awtColor = composeColor.toAwtColor() ?: return null
+
+        leaf.putUserData(KEY_COMPOSE_COLOR_FQ, colorFunction)
+        return EditableColorLineMarkerInfo(
+            color = awtColor,
+            message = UIBundle.message("dialog.title.choose.color"),
+            anchor = leaf,
+            colorApplier = { selectedAwtColor -> setColorTo(leaf, composeColor, selectedAwtColor) },
+        )
     }
 
-    private fun setColorTo(leaf: LeafPsiElement, awtColor: java.awt.Color) {
-        val expression = leaf.getUserData(KEY_COMPOSE_COLOR_FQ) ?: findColorSource(leaf)
-        val colorFunction = expression?.createColorFunction() ?: return
-        val currentComposeColor = colorFunction.getColor() ?: return
-        val newComposeColor = Color(awtColor.red, awtColor.green, awtColor.blue, awtColor.alpha)
-            .convert(currentComposeColor.colorSpace)
-
-        if (currentComposeColor == newComposeColor) return
+    private fun setColorTo(leaf: LeafPsiElement, currentComposeColor: Color, selectedAwtColor: java.awt.Color) {
+        val colorFunction = leaf.getUserData(KEY_COMPOSE_COLOR_FQ) ?: return
+        val newComposeColor = selectedAwtColor.toComposeColor().convert(currentComposeColor.colorSpace)
 
         val factory = KtPsiFactory(leaf.project, true)
         colorFunction.setNewColor(newComposeColor, factory)
     }
 
     private fun findColorSource(leaf: LeafPsiElement): KtCallExpression? {
-        val callExpression = when (val parent1 = leaf.parent) {
-            is KtParameter -> parent1.getChildOfType<KtCallExpression>()
-            is KtProperty -> parent1.getInitializerOrGetterInitializer()?.safeCast<KtCallExpression>()
-            is KtNameReferenceExpression -> findCallByReferenceExpression(leaf, parent1)
+        val callExpression = when (val parent = leaf.parent) {
+            is KtParameter -> parent.getChildOfType<KtCallExpression>()
+            is KtProperty -> parent.getInitializerOrGetterInitializer()?.safeCast<KtCallExpression>()
+            is KtNameReferenceExpression -> findCallByReferenceExpression(leaf, parent)
             else -> null
         }
 
@@ -87,13 +80,13 @@ internal data object EditableColorLineMarkerProviderDelegate : LineMarkerProvide
                 is KtParameter,
                 is KtProperty,
                 is KtPropertyAccessor,
-                -> null // skip it, we've already attached icons to prop/param identifier
+                    -> null // skip it, we've already attached icons to prop/param identifier
 
                 is KtBlockExpression,
                 is KtBinaryExpression,
                 is KtReturnExpression,
                 is KtDotQualifiedExpression,
-                -> refParent.takeIf { refParent.getCallNameExpression()?.getIdentifier() == leaf }
+                    -> refParent.takeIf { refParent.getCallNameExpression()?.getIdentifier() == leaf }
 
                 is KtValueArgument -> refParent.takeUnless { callParent.isNamed() }
                 else -> refParent
@@ -104,29 +97,29 @@ internal data object EditableColorLineMarkerProviderDelegate : LineMarkerProvide
     }
 
     private class EditableColorLineMarkerInfo(
-        color: java.awt.Color,
+        color: AwtColor,
         message: String,
         anchor: LeafPsiElement,
-        colorApplier: (element: LeafPsiElement, color: java.awt.Color) -> Unit,
+        colorApplier: (color: AwtColor) -> Unit,
     ) : ColorAwareLineMarkerInfo(
         color = color,
         anchor = anchor,
         tooltipText = message,
-        navHandler = NavigationHandler(anchor, color, colorApplier),
+        navHandler = if (anchor.isWritable) NavigationHandler(anchor, color, colorApplier) else null,
     )
 
     private class NavigationHandler(
         private val anchor: LeafPsiElement,
-        private val color: java.awt.Color,
-        private val colorApplier: (element: LeafPsiElement, color: java.awt.Color) -> Unit,
+        private val color: AwtColor,
+        private val colorApplier: (color: AwtColor) -> Unit,
     ) : GutterIconNavigationHandler<PsiElement> {
         override fun navigate(e: MouseEvent, elt: PsiElement) {
             if (!elt.isWritable) return
 
-            ColorChooserService.instance.showPopup(
+            ColorChooserService.getInstance().showPopup(
                 project = anchor.project,
                 currentColor = color,
-                listener = { c, _ -> runWriteAction { colorApplier(anchor, c) } },
+                listener = { c, _ -> colorApplier(c) },
                 location = RelativePoint(e.component, e.point),
                 showAlpha = true,
             )

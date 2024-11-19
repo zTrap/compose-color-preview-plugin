@@ -1,8 +1,10 @@
 plugins {
-    java
-    alias(deps.plugins.intellij)
     alias(deps.plugins.kotlin.forPlugin)
+    alias(deps.plugins.intellij)
+    java
 }
+
+val eap = false
 
 repositories {
     mavenCentral()
@@ -10,20 +12,37 @@ repositories {
     gradlePluginPortal()
 
     intellijPlatform.defaultRepositories()
+
+    if (eap) {
+        intellijPlatform.snapshots()
+        intellijPlatform.nightly()
+    }
 }
 
+val suffix = "-EAP".takeIf { eap }.orEmpty()
+
 group = "ru.ztrap.plugin.idea"
-version = "${deps.versions.plugin.get()}-${deps.versions.idea.code.min.get()}"
+version = "${deps.versions.plugin.get()}-${deps.versions.idea.code.min.get()}$suffix"
 
 dependencies {
     intellijPlatform {
-        intellijIdeaCommunity(deps.versions.idea.name)
+        val versionName = if (eap) {
+            buildString {
+                append(deps.versions.idea.code.min.get())
+                append("-EAP-SNAPSHOT")
+            }
+        } else {
+            deps.versions.idea.name.get()
+        }
+        intellijIdea(versionName) {
+            useInstaller = !eap
+        }
         bundledPlugin("com.intellij.java")
         bundledPlugin("org.jetbrains.kotlin")
 
         pluginVerifier()
         zipSigner()
-        instrumentationTools()
+        jetbrainsRuntime()
     }
 }
 
@@ -50,19 +69,9 @@ intellijPlatform {
 
     publishing {
         token = stringProp("publishing.plugin.token")
-    }
-}
-
-val jvmVersion = deps.versions.jvm.get()
-
-tasks {
-    compileJava {
-        sourceCompatibility = jvmVersion
-        targetCompatibility = jvmVersion
-    }
-
-    compileKotlin {
-        kotlinOptions.jvmTarget = jvmVersion
+        if (eap) {
+            channels = listOf("eap")
+        }
     }
 }
 

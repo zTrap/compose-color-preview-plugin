@@ -13,7 +13,8 @@ internal const val MAX_COMPONENT_FLOAT = 1f
 internal const val MAX_COMPONENT_HEX = 0xFF
 
 internal const val HEX_FORMAT_PREFIX = "0x"
-internal const val HEX_FORMAT = "$HEX_FORMAT_PREFIX%08x"
+internal const val HEX_FORMAT_SHORT = "$HEX_FORMAT_PREFIX%02x"
+internal const val HEX_FORMAT_FULL = "$HEX_FORMAT_PREFIX%08x"
 internal const val HEX_FORMAT_RADIX = 16
 
 internal const val COMPOSE_ARG_NAME_HUE = "hue"

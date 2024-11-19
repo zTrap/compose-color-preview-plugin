@@ -9,6 +9,8 @@ import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
 import org.jetbrains.kotlin.psi.KtNameReferenceExpression
 
+internal typealias AwtColor = java.awt.Color
+
 internal fun PsiElement.getColor(): Color = getColorOrNull().requireNotNull()
 
 internal fun PsiElement.getColorOrNull(): Color? {
@@ -37,13 +39,15 @@ internal fun KtCallExpression.getParentReceiverColor(): Color? {
         ?.getColorOrNull()
 }
 
-internal fun Color.getComponents(): FloatArray = floatArrayOf(red, green, blue, alpha)
-
 @Suppress("UseJBColor")
-internal fun Color.toAwtColor(): java.awt.Color? {
+internal fun Color.toAwtColor(): AwtColor? {
     return convert(ColorSpaces.Srgb)
-        .runCatching { java.awt.Color(red, green, blue, alpha) }
+        .runCatching { AwtColor(red, green, blue, alpha) }
         .getOrNull()
+}
+
+internal fun AwtColor.toComposeColor(): Color {
+    return Color(red, green, blue, alpha)
 }
 
 internal fun FloatArray.toHsl(): FloatArray {

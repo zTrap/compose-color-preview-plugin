@@ -81,21 +81,33 @@ internal fun KtPsiFactory.createNewLongExpression(argument: KtValueArgument, val
     val result = ((ulongValue shr 32) shl 32) or value.toUInt().toULong()
 
     return if (hex) {
-        createExpression(HEX_FORMAT.format(result.toLong()))
+        createExpression(HEX_FORMAT_FULL.format(result.toLong()))
     } else {
         createExpression(result.toLong().toString())
     }
 }
 
-internal fun KtPsiFactory.createNewIntExpression(argument: KtValueArgument, value: Float): KtExpression {
-    return createNewIntExpression(argument, fractionToHex(value))
+internal fun KtPsiFactory.createNewIntExpression(
+    argument: KtValueArgument,
+    value: Float,
+    isShortFormat: Boolean = true,
+): KtExpression {
+    return createNewIntExpression(argument, fractionToHex(value), isShortFormat)
 }
 
-internal fun KtPsiFactory.createNewIntExpression(argument: KtValueArgument, value: Int): KtExpression {
+internal fun KtPsiFactory.createNewIntExpression(
+    argument: KtValueArgument,
+    value: Int,
+    isShortFormat: Boolean = true,
+): KtExpression {
     val argumentText = argument.lastChild.text
 
     val text = if (argumentText.startsWith(HEX_FORMAT_PREFIX, true)) {
-        HEX_FORMAT.format(value)
+        if (isShortFormat) {
+            HEX_FORMAT_SHORT.format(value)
+        } else {
+            HEX_FORMAT_FULL.format(value)
+        }
     } else {
         value.toString()
     }

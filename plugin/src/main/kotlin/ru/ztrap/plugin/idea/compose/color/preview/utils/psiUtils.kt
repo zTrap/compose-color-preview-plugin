@@ -9,10 +9,13 @@ import com.intellij.psi.tree.IElementType
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.psi.util.siblings
 import org.jetbrains.kotlin.KtNodeTypes
+import org.jetbrains.kotlin.analysis.api.analyze
+import org.jetbrains.kotlin.analysis.api.base.KaConstantValue
 import org.jetbrains.kotlin.asJava.namedUnwrappedElement
+import org.jetbrains.kotlin.idea.base.psi.astReplace
 import org.jetbrains.kotlin.idea.base.psi.kotlinFqName
-import org.jetbrains.kotlin.idea.caches.resolve.analyze
 import org.jetbrains.kotlin.idea.references.mainReference
+import org.jetbrains.kotlin.lexer.KtTokens
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtConstantExpression
@@ -28,17 +31,13 @@ import org.jetbrains.kotlin.psi.KtPrefixExpression
 import org.jetbrains.kotlin.psi.KtProperty
 import org.jetbrains.kotlin.psi.KtReferenceExpression
 import org.jetbrains.kotlin.psi.KtValueArgument
-import org.jetbrains.kotlin.psi.psiUtil.astReplace
 import org.jetbrains.kotlin.psi.psiUtil.getCallNameExpression
 import org.jetbrains.kotlin.psi.psiUtil.getParentOfType
-import org.jetbrains.kotlin.resolve.constants.evaluate.ConstantExpressionEvaluator
-import org.jetbrains.kotlin.resolve.lazy.BodyResolveMode
-import org.jetbrains.kotlin.types.TypeUtils
 import ru.ztrap.plugin.idea.compose.color.preview.ColorFunction
 import ru.ztrap.plugin.idea.compose.color.preview.ColorsExpressionsPack
 import ru.ztrap.plugin.idea.compose.color.preview.ColorsValueArgumentsPack
 
-internal val KEY_COMPOSE_COLOR_FQ = Key.create<KtCallExpression>("COMPOSE_COLOR_FQ")
+internal val KEY_COMPOSE_COLOR_FQ = Key.create<ColorFunction>("COMPOSE_COLOR_FQ")
 
 internal inline fun <reified T : PsiElement> PsiElement.firstSiblingOfTypeOrNull(forward: Boolean = true): T? {
     return siblings(forward).filterIsInstance<T>().firstOrNull()
@@ -163,8 +162,8 @@ internal fun KtCallExpression.createColorFunction(): ColorFunction? {
 internal fun KtReferenceExpression.resolveMainReference(): PsiElement? = mainReference.resolve()
 
 internal fun KtDeclaration.getInitializerOrGetterInitializer(): KtExpression? {
-    if (this is KtDeclarationWithInitializer && initializer != null) return initializer
-    return (this as? KtProperty)?.getter?.initializer
+    return safeCast<KtDeclarationWithInitializer>()?.initializer
+        ?: safeCast<KtProperty>()?.getter?.initializer
 }
 
 internal fun List<KtValueArgument>.findColorSpaceArg(): KtValueArgument? {
@@ -201,7 +200,7 @@ internal fun KtValueArgument?.getSpaceOrNull(): ColorSpace? {
     }
 }
 
-internal fun PsiElement?.getULong(): ULong = getNumber { toLong() }.toULong()
+internal fun PsiElement?.getULong(): ULong = getNumber { toULong() }
 internal fun PsiElement?.getLong(): Long = getNumber { toLong() }
 internal fun PsiElement?.getInt(): Int = getNumber { toInt() }
 internal fun PsiElement?.getFloat(): Float = getNumber { toFloat() }
@@ -239,7 +238,7 @@ private inline fun <reified T : PsiElement> PsiElement.haveParentOfType(strict: 
 
 private fun PsiElement.isTyped(type: IElementType): Boolean {
     return when (val lastChild = lastChild) {
-        is KtConstantExpression -> lastChild.elementType == type
+        is KtConstantExpression -> lastChild.iElementType == type
         is KtPrefixExpression -> lastChild.isTyped(type)
         else -> false
     }
@@ -258,30 +257,52 @@ private fun List<KtValueArgument>.getValidCount(): Int {
         }
 }
 
-private fun <T : Number> PsiElement?.getNumber(converter: String.() -> T): T {
+private fun <T : Comparable<T>> PsiElement?.getNumber(converter: String.() -> T): T {
     return when (val lastChild = this?.lastChild) {
         is KtConstantExpression -> converter(lastChild.getConstantValue().toString())
-        is KtPrefixExpression -> -lastChild.getNumber(converter)
+        is KtPrefixExpression -> when (lastChild.operationToken) {
+            KtTokens.MINUS -> -lastChild.getNumber(converter)
+            KtTokens.PLUS -> +lastChild.getNumber(converter)
+            else -> error("Unexpected type operation token ${lastChild.operationToken}")
+        }
+
         else -> error("Unexpected type ${lastChild?.javaClass?.canonicalName}. Last child for $this(${this?.text})")
     }
 }
 
-private fun KtConstantExpression.getConstantValue(): Any? {
-    return ConstantExpressionEvaluator
-        .getConstant(
-            expression = this,
-            bindingContext = analyze(BodyResolveMode.PARTIAL),
-        )
-        ?.getValue(TypeUtils.NO_EXPECTED_TYPE)
+private fun KtConstantExpression.getConstantValue(): Any {
+    return analyze(this) {
+        when (val evaluated = evaluate()) {
+            is KaConstantValue.DoubleValue -> evaluated.value
+            is KaConstantValue.FloatValue -> evaluated.value
+            is KaConstantValue.LongValue -> evaluated.value
+            is KaConstantValue.IntValue -> evaluated.value
+            is KaConstantValue.ULongValue -> evaluated.value
+            else -> error("Unexpected const type $evaluated")
+        }
+    }
 }
 
 @Suppress("UNCHECKED_CAST")
-private operator fun <T : Number> T.unaryMinus(): T {
+private operator fun <T : Comparable<T>> T.unaryMinus(): T {
     return when (this) {
+        is ULong -> unaryMinus() as T
         is Double -> unaryMinus() as T
         is Float -> unaryMinus() as T
         is Long -> unaryMinus() as T
         is Int -> unaryMinus() as T
+        else -> error("Unexpected type ${javaClass.canonicalName}")
+    }
+}
+
+@Suppress("UNCHECKED_CAST")
+private operator fun <T : Comparable<T>> T.unaryPlus(): T {
+    return when (this) {
+        is ULong -> unaryMinus() as T
+        is Double -> unaryPlus() as T
+        is Float -> unaryPlus() as T
+        is Long -> unaryPlus() as T
+        is Int -> unaryPlus() as T
         else -> error("Unexpected type ${javaClass.canonicalName}")
     }
 }

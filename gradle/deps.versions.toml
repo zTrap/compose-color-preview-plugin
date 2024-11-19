@@ -1,18 +1,26 @@
 [versions]
-# https://plugins.jetbrains.com/docs/intellij/using-kotlin.html#kotlin-standard-library
-kotlin-forPlugin = "1.9.24"
-kotlin-forSample = "1.9.24"
-intellij = "2.0.0" # https://plugins.gradle.org/plugin/org.jetbrains.intellij.platform
-compose = "1.6.11" # https://plugins.gradle.org/plugin/org.jetbrains.compose
+# https://plugins.jetbrains.com/docs/intellij/using-kotlin.html#bundled-stdlib-versions
+kotlin-forPlugin = "2.4.0"
+kotlin-forSample = "2.4.0"
+intellij = "2.18.1" # https://plugins.gradle.org/plugin/org.jetbrains.intellij.platform
+compose = "1.11.1" # https://plugins.gradle.org/plugin/org.jetbrains.compose
 
-plugin = "0.0.9"
-idea-name = "2024.2"
-idea-code-min = "242"
-idea-code-max = "242"
-jvm = "21"
+plugin = "0.0.10"
+idea-name = "2026.2" # https://mvnrepository.com/artifact/com.jetbrains.intellij.idea/ideaIC
+idea-code-min = "262"
+idea-code-max = "262"
+
+[libraries]
+compose-runtime = { module = "org.jetbrains.compose.runtime:runtime", version.ref = "compose" }
+compose-foundation = { module = "org.jetbrains.compose.foundation:foundation", version.ref = "compose" }
+compose-material = { module = "org.jetbrains.compose.material:material", version.ref = "compose" }
+compose-ui = { module = "org.jetbrains.compose.ui:ui", version.ref = "compose" }
+compose-resources = { module = "org.jetbrains.compose.components:components-resources", version.ref = "compose" }
+compose-preview = { module = "org.jetbrains.compose.components:components-ui-tooling-preview", version.ref = "compose" }
 
 [plugins]
 kotlin-forPlugin = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin-forPlugin" }
 kotlin-forSample = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin-forSample" }
 intellij = { id = "org.jetbrains.intellij.platform", version.ref = "intellij" }
 compose = { id = "org.jetbrains.compose", version.ref = "compose" }
+compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin-forSample" }
