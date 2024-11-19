@@ -1,7 +1,9 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
-    java
-    alias(deps.plugins.intellij)
     alias(deps.plugins.kotlin.forPlugin)
+    alias(deps.plugins.intellij)
+    java
 }
 
 repositories {
@@ -62,7 +64,15 @@ tasks {
     }
 
     compileKotlin {
-        kotlinOptions.jvmTarget = jvmVersion
+        compilerOptions.jvmTarget = JvmTarget.fromTarget(jvmVersion)
+    }
+}
+
+val runIdeK2 by intellijPlatformTesting.runIde.registering {
+    task {
+        jvmArgumentProviders += CommandLineArgumentProvider {
+            listOf("-Didea.kotlin.plugin.use.k2=true")
+        }
     }
 }
 
