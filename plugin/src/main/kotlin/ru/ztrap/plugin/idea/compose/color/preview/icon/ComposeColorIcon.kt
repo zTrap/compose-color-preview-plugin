@@ -2,10 +2,11 @@ package ru.ztrap.plugin.idea.compose.color.preview.icon
 
 import com.intellij.ui.JBColor
 import com.intellij.ui.paint.RectanglePainter
+import com.intellij.ui.scale.JBUIScale
 import com.intellij.ui.scale.JBUIScale.scale
-import com.intellij.util.ui.EmptyIcon
 import com.intellij.util.ui.GraphicsUtil
 import com.intellij.util.ui.ImageUtil
+import com.intellij.util.ui.JBCachingScalableIcon
 import com.jetbrains.rd.swing.fillRect
 import java.awt.Color
 import java.awt.Component
@@ -17,16 +18,22 @@ import java.awt.RenderingHints
 import java.awt.TexturePaint
 import java.awt.image.BufferedImage
 
-internal class ComposeColorIcon : EmptyIcon {
+internal class ComposeColorIcon : JBCachingScalableIcon<ComposeColorIcon> {
+    private val size: Int
     private val colors: Array<out Color>
 
-    @Suppress("DEPRECATION")
-    constructor(size: Int, vararg colors: Color) : super(size, size) {
+    constructor(size: Int, vararg colors: Color) {
+        this.size = size
         this.colors = colors
     }
 
     constructor(icon: ComposeColorIcon) : super(icon) {
+        this.size = icon.size
         this.colors = icon.colors
+    }
+
+    init {
+        JBUIScale.addUserScaleChangeListener { clearCachedScaledValue() }
     }
 
     companion object {
@@ -62,26 +69,33 @@ internal class ComposeColorIcon : EmptyIcon {
         }
     }
 
-    override fun copy(): ComposeColorIcon = ComposeColorIcon(this)
+    override fun getIconWidth(): Int = size
+    override fun getIconHeight(): Int = size
+    override fun copy(): ComposeColorIcon = ComposeColorIcon(this).also { it.updateContextFrom(this) }
 
     override fun paintIcon(component: Component, g: Graphics, x: Int, y: Int) {
         val graphics = g.create() as Graphics2D
         val config = GraphicsUtil.setupAAPainting(graphics)
 
         try {
-            val w = iconWidth
-            val h = iconHeight
-
             when (colors.size) {
-                1 -> graphics.fillRect(x, y, w, h, CHESS, colors[0])
+                1 -> graphics.fillRect(x, y, size, CHESS, colors.component1())
                 2 -> {
-                    graphics.fillPolygon(intArrayOf(x, x + w, x), intArrayOf(y, y, y + h), CHESS, colors[0])
-                    graphics.fillPolygon(intArrayOf(x + w, x + w, x), intArrayOf(y, y + h, y + h), CHESS, colors[1])
+                    graphics.fillTriangle(
+                        xPoints = intArrayOf(x, x + size, x),
+                        yPoints = intArrayOf(y, y, y + size),
+                        colors = arrayOf(CHESS, colors.component1()),
+                    )
+                    graphics.fillTriangle(
+                        xPoints = intArrayOf(x + size, x + size, x),
+                        yPoints = intArrayOf(y, y + size, y + size),
+                        colors = arrayOf(CHESS, colors.component2())
+                    )
                 }
 
-                else -> for (i in colors.indices) {
-                    graphics.fillRect(i, x, y, w, h, CHESS, colors[i])
-                    if (i == 3) break
+                else -> for (index in colors.indices) {
+                    graphics.fillRect(index, x, y, size, CHESS, colors[index])
+                    if (index == 3) break
                 }
             }
         } catch (e: Exception) {
@@ -92,28 +106,28 @@ internal class ComposeColorIcon : EmptyIcon {
         }
     }
 
-    private fun Graphics2D.fillRect(i: Int, x: Int, y: Int, w: Int, h: Int, vararg colors: Paint) {
+    private fun Graphics2D.fillRect(index: Int, x: Int, y: Int, size: Int, vararg colors: Paint) {
         colors.forEach {
             paint = it
             RectanglePainter.FILL.paint(
                 /* g = */ this,
-                /* x = */ if (i % 2 == 0) x else x + w / 2 + 1,
-                /* y = */ if (i < 2) y else y + h / 2 + 1,
-                /* width = */ w / 2 - 1,
-                /* height = */ h / 2 - 1,
+                /* x = */ if (index % 2 == 0) x else x + size / 2 + 1,
+                /* y = */ if (index < 2) y else y + size / 2 + 1,
+                /* width = */ size / 2 - 1,
+                /* height = */ size / 2 - 1,
                 /* object = */ null,
             )
         }
     }
 
-    private fun Graphics2D.fillRect(x: Int, y: Int, width: Int, height: Int, vararg colors: Paint) {
+    private fun Graphics2D.fillRect(x: Int, y: Int, size: Int, vararg colors: Paint) {
         colors.forEach {
             paint = it
-            fillRect(x, y, width, height)
+            fillRect(x, y, size, size)
         }
     }
 
-    private fun Graphics2D.fillPolygon(xPoints: IntArray, yPoints: IntArray, vararg colors: Paint) {
+    private fun Graphics2D.fillTriangle(xPoints: IntArray, yPoints: IntArray, vararg colors: Paint) {
         colors.forEach {
             paint = it
             fillPolygon(xPoints, yPoints, 3)
@@ -122,15 +136,14 @@ internal class ComposeColorIcon : EmptyIcon {
 
     override fun equals(other: Any?): Boolean {
         return this === other ||
-                super.equals(other) &&
                 other is ComposeColorIcon &&
-                iconWidth == other.iconWidth &&
-                iconHeight == other.iconHeight &&
+                size == other.size &&
                 colors.contentEquals(other.colors)
     }
 
     override fun hashCode(): Int {
         var result = super.hashCode()
+        result = 31 * result + size.hashCode()
         result = 31 * result + colors.contentHashCode()
         return result
     }

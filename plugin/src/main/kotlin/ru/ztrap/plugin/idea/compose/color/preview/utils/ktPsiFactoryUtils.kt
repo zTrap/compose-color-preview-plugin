@@ -1,5 +1,6 @@
 package ru.ztrap.plugin.idea.compose.color.preview.utils
 
+import com.intellij.openapi.application.runReadAction
 import org.jetbrains.kotlin.psi.KtExpression
 import org.jetbrains.kotlin.psi.KtPsiFactory
 import org.jetbrains.kotlin.psi.KtValueArgument
@@ -64,7 +65,7 @@ internal fun KtPsiFactory.createNewULongExpression(argument: KtValueArgument, va
             argumentText.endsWith("u", true) -> append(argumentText.takeLast(1))
         }
     }
-    return createExpression(text)
+    return createExpressionInReadAction(text)
 }
 
 internal fun KtPsiFactory.createNewLongExpression(argument: KtValueArgument, value: Int): KtExpression {
@@ -81,9 +82,9 @@ internal fun KtPsiFactory.createNewLongExpression(argument: KtValueArgument, val
     val result = ((ulongValue shr 32) shl 32) or value.toUInt().toULong()
 
     return if (hex) {
-        createExpression(HEX_FORMAT.format(result.toLong()))
+        createExpressionInReadAction(HEX_FORMAT.format(result.toLong()))
     } else {
-        createExpression(result.toLong().toString())
+        createExpressionInReadAction(result.toLong().toString())
     }
 }
 
@@ -100,27 +101,27 @@ internal fun KtPsiFactory.createNewIntExpression(argument: KtValueArgument, valu
         value.toString()
     }
 
-    return createExpression(text)
+    return createExpressionInReadAction(text)
 }
 
 internal fun KtPsiFactory.createAlphaIntArgument(value: Float): KtValueArgument {
-    return createArgument(createIntString(COMPOSE_ARG_NAME_ALPHA, value))
+    return createArgumentInReadAction(createIntString(COMPOSE_ARG_NAME_ALPHA, value))
 }
 
 internal fun KtPsiFactory.createIntArgument(value: Float): KtValueArgument {
-    return createArgument(createIntString(value = value))
+    return createArgumentInReadAction(createIntString(value = value))
 }
 
 internal fun KtPsiFactory.createAlphaFloatArgument(value: Float): KtValueArgument {
-    return createArgument(createFloatString(COMPOSE_ARG_NAME_ALPHA, value))
+    return createArgumentInReadAction(createFloatString(COMPOSE_ARG_NAME_ALPHA, value))
 }
 
 internal fun KtPsiFactory.createFloatArgument(value: Float): KtValueArgument {
-    return createArgument(createFloatString(value = value))
+    return createArgumentInReadAction(createFloatString(value = value))
 }
 
 private fun KtPsiFactory.createNewFloatExpression(name: String? = null, value: Float): KtExpression {
-    return createExpression(createFloatString(name, value))
+    return createExpressionInReadAction(createFloatString(name, value))
 }
 
 private fun createFloatString(name: String? = null, value: Float): String = buildString {
@@ -139,4 +140,12 @@ private fun createIntString(name: String? = null, value: Float): String = buildS
     }
     append(HEX_FORMAT_PREFIX)
     append(fractionToHex(value).toUInt().toString(HEX_FORMAT_RADIX))
+}
+
+private fun KtPsiFactory.createExpressionInReadAction(text: String): KtExpression {
+    return runReadAction { createExpression(text) }
+}
+
+private fun KtPsiFactory.createArgumentInReadAction(text: String): KtValueArgument {
+    return runReadAction { createArgument(text) }
 }
