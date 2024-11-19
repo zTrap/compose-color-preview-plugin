@@ -37,13 +37,15 @@ internal fun KtCallExpression.getParentReceiverColor(): Color? {
         ?.getColorOrNull()
 }
 
-internal fun Color.getComponents(): FloatArray = floatArrayOf(red, green, blue, alpha)
-
 @Suppress("UseJBColor")
 internal fun Color.toAwtColor(): java.awt.Color? {
     return convert(ColorSpaces.Srgb)
         .runCatching { java.awt.Color(red, green, blue, alpha) }
         .getOrNull()
+}
+
+internal fun java.awt.Color.toComposeColor(): Color {
+    return Color(red, green, blue, alpha)
 }
 
 internal fun FloatArray.toHsl(): FloatArray {

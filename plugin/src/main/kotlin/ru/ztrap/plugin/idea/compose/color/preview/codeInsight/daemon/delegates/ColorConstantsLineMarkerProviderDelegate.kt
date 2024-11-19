@@ -35,7 +35,7 @@ internal data object ColorConstantsLineMarkerProviderDelegate : LineMarkerProvid
     private fun setNavigateAction(info: ColorConstantLineMarkerInfo) {
         NavigateAction.setNavigateAction(
             /* info = */ info,
-            /* text = */ "Go To Color Declaration",
+            /* text = */ "Go to Color Declaration",
             /* originalActionId = */ null,
             /* icon = */ AllIcons.Actions.Colors,
         )

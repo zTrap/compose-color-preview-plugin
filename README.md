@@ -55,7 +55,7 @@ plugins:
 </details>
 <br/>
 <details>
-  <summary>Starting from IDEA 2024.1 colors list order in popup is reversed. Can you fix it?</summary>
+  <summary><s>Starting from IDEA 2024.1 colors list order in popup is reversed. Can you fix it?</s> <b>Fixed in IDEA 2024.2</b></summary>
   <br/>
   Unfortunately, no. It's Intellij IDEA Platform bug and <a href="https://youtrack.jetbrains.com/issue/IJPL-26348/Reversed-items-order-in-line-markers-popup">the issue</a> 
   is created. So we can only wait for a fix from JetBrains
@@ -66,7 +66,7 @@ plugins:
   <summary>Hex in color picker have wrong pattern. Can you fix it?</summary>
   <br/>
   Yes, but it requires a complete rewrite of the color picker popup which is not what I want to do. 
-  A request for this feature has been <a href="https://youtrack.jetbrains.com/issue/IJPL-148574/Provide-the-ability-to-configure-the-hex-pattern-for-the-color-picker-in-gutter">submitted</a> to JetBrains, and we need to wait for a reaction
+  The request for this feature has been <a href="https://youtrack.jetbrains.com/issue/IJPL-148574/Provide-the-ability-to-configure-the-hex-pattern-for-the-color-picker-in-gutter">submitted</a> to JetBrains, and we need to wait for a reaction
 </details>
 
 ## Contribution
